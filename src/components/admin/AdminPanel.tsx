@@ -2,14 +2,63 @@
 import Logo from "@/components/layout/Logo";
 import Styles from "@/app/admin/admin.module.css";
 import Code from "@/components/layout/Code";
-import { LuPencilLine,LuFileText,LuChartLine,LuSettings,LuArrowUp,  LuHeading1,LuHeading2,LuHeading3,LuBold,LuPilcrow,LuCode,LuList,LuListOrdered,LuQuote } from "react-icons/lu";
-import {useState, useCallback} from "react";
+import { 
+  LuPencilLine, 
+  LuFileText, 
+  LuChartLine, 
+  LuSettings, 
+  LuArrowUp,  
+  LuHeading1, 
+  LuHeading2, 
+  LuHeading3, 
+  LuBold, 
+  LuPilcrow, 
+  LuCode, 
+  LuList, 
+  LuListOrdered, 
+  LuQuote 
+} from "react-icons/lu";
+import { useState, useCallback, KeyboardEvent, ChangeEvent } from "react";
 import { GoogleGenAI } from "@google/genai";
 import Markdown from 'react-markdown';
+import { ReactNode, CSSProperties } from 'react';
 
-const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || '' });
 
-const blogToolsList = [
+interface BlogTool {
+  title: string;
+  icon: ReactNode;
+  onClick: () => void;
+}
+
+interface ChatMessage {
+  text: string;
+  type: "user" | "ai";
+}
+
+interface ChatMessageProps {
+  text: string;
+  type: "user" | "ai";
+}
+
+interface PreviewBoxProps {
+  style?: CSSProperties;
+}
+
+interface AIBoxProps {
+  style?: CSSProperties;
+  components: ChatMessage[];
+  aiLoading: boolean;
+  inputText: string;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleKeyPress: (e: KeyboardEvent<HTMLInputElement>) => void;
+  handleSendMessage: () => void;
+}
+
+type TabType = "createBlog" | "addBlog" | "analytics" | "settings";
+type PreviewTabType = "preview" | "ai";
+
+const blogToolsList: BlogTool[] = [
   {
     title: "Heading 1",
     icon: <LuHeading1 />,
@@ -57,7 +106,7 @@ const blogToolsList = [
   }
 ];
 
-const ChatMessage = ({text, type}) => (
+const ChatMessageComponent: React.FC<ChatMessageProps> = ({ text, type }) => (
   <span className={type === "user" ? Styles.AIBoxUserMessage : Styles.AIBoxAIMessage}>
     {type === "user" ? <p>{text}</p> : 
       <Markdown
@@ -84,13 +133,21 @@ const ChatMessage = ({text, type}) => (
   </span>
 );
 
-const PreviewBox = ({style}) => (
+const PreviewBox: React.FC<PreviewBoxProps> = ({ style }) => (
   <div className={Styles.previewBox} style={style}>
     <h1>previewBox</h1>
   </div>
 );
 
-const AIBox = ({style, components, aiLoading, inputText, handleInputChange, handleKeyPress, handleSendMessage}) => (
+const AIBox: React.FC<AIBoxProps> = ({ 
+  style, 
+  components, 
+  aiLoading, 
+  inputText, 
+  handleInputChange, 
+  handleKeyPress, 
+  handleSendMessage 
+}) => (
   <div className={Styles.AIBox} style={style}>
     <div className={`${Styles.AIBoxMessageBox} overflow-none`}>
       {components.length === 0 ? (
@@ -99,7 +156,7 @@ const AIBox = ({style, components, aiLoading, inputText, handleInputChange, hand
         </span>
         ) : (
         components.map((comp, index) => (
-          <ChatMessage key={index} text={comp.text} type={comp.type}/>
+          <ChatMessageComponent key={index} text={comp.text} type={comp.type}/>
         ))
       )}
     </div>
@@ -124,14 +181,14 @@ const AIBox = ({style, components, aiLoading, inputText, handleInputChange, hand
   </div>
 );
   
-const AdminPanel = () => {
-  const [tab, setTab] = useState("createBlog");
-  const [previewTab, setPreviewTab] = useState("ai");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [inputText, setInputText] = useState("");
-  const [components, setComponents] = useState([]);
+const AdminPanel: React.FC = () => {
+  const [tab, setTab] = useState<TabType>("createBlog");
+  const [previewTab, setPreviewTab] = useState<PreviewTabType>("ai");
+  const [aiLoading, setAiLoading] = useState<boolean>(false);
+  const [inputText, setInputText] = useState<string>("");
+  const [components, setComponents] = useState<ChatMessage[]>([]);
 
-  const generateText = useCallback(async () => {
+  const generateText = useCallback(async (): Promise<void> => {
     if (!process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY) {
       setComponents(prev => [...prev, {
         text: "API key not configured. Please check your environment variables.", 
@@ -155,7 +212,7 @@ const AdminPanel = () => {
     }
   }, [inputText]);
 
-  const handleSendMessage = useCallback(() => {
+  const handleSendMessage = useCallback((): void => {
     if (inputText.trim() && !aiLoading) {
       setComponents(prev => [...prev, {text: inputText, type: "user"}]);
       generateText();
@@ -163,18 +220,18 @@ const AdminPanel = () => {
     }
   }, [inputText, aiLoading, generateText]);
 
-  const handleInputChange = useCallback((e) => {
+  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
     setInputText(e.target.value);
   }, []);
 
-  const handleKeyPress = useCallback((e) => {
+  const handleKeyPress = useCallback((e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   }, [handleSendMessage]);
 
-  function createBlog() {
+  function createBlog(): JSX.Element {
     return (
       <div className={Styles.createBlog}>
         <div className={Styles.createBlogDiv}>
