@@ -1,0 +1,42 @@
+"use client";
+import React, { useEffect, useRef } from 'react';
+import { annotate } from 'rough-notation';
+
+const RoughNotation = ({
+  children,
+  type = 'underline',
+  color = 'rgb(var(--theme))',
+  animate = true,
+  animationDuration = 1000,
+  multiline = false,
+  show = true,
+  padding = 5
+}) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current && show) {
+      // Resolve CSS variable if used
+      let resolvedColor = color;
+      if (color.startsWith('var(')) {
+        resolvedColor = getComputedStyle(document.documentElement).getPropertyValue(
+          color.slice(4, -1).trim()
+        );
+      }
+
+      const annotation = annotate(ref.current, {
+        type,
+        color: resolvedColor.trim(),
+        animate,
+        animationDuration,
+        multiline,
+        padding
+      });
+      annotation.show();
+    }
+  }, [type, color, animate, animationDuration, multiline, show, padding]);
+
+  return <span ref={ref}>{children}</span>;
+};
+
+export default RoughNotation;

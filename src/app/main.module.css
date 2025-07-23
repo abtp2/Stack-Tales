@@ -1,0 +1,190 @@
+
+.hero{
+width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 4rem 0 3rem 0;
+text-align: center;
+background-color: transparent;
+background-image: 
+  linear-gradient(to right, var(--lines) 0.5px, transparent 0.5px),
+  linear-gradient(to bottom, var(--lines) 0.5px, transparent 0.5px),
+  linear-gradient(rgba(var(--theme),0.2), transparent),
+  linear-gradient(transparent, rgba(var(--theme),0.2));
+background-size: 45% 45%, 45% 45%, 100% 50%, 100% 5px;
+background-repeat: repeat, repeat, no-repeat,no-repeat;
+background-position-x: center;
+background-position-y: top,top,top,bottom;
+}
+.hero p{
+display: inline-flex;
+gap: 10px;
+align-items: center;
+font-size: 14px;
+border: none;
+padding: 8px 1rem;
+border-radius: 50px;
+background: var(--fade);
+border: 1px solid rgba(var(--color), 0.2);
+color: rgb(var(--color));
+margin: 0 0 1rem 0;
+}
+.sparkleIcon{
+width: 18px;
+height: 18px;
+}
+.hero h1{
+max-width: 600px;
+margin: 0 auto;
+padding: 0 1rem;
+font-size: 2rem;
+font-family: "Changa One", sans-serif;
+font-weight: 400;
+font-style: normal;
+line-height: 1.6;
+}
+.hero span:nth-of-type(1){
+color: rgba(var(--color), 0.5);
+}
+.heroAvatars{
+width: 100%;
+margin: 3rem auto 2rem auto;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.heroAvatars span{
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.heroAvatars span img{
+width: 35px;
+height: 35px;
+border: 1.8px solid rgba(var(--dcolor), 0.9);
+border-radius: 100%;
+position: relative;
+margin: 0 -8px;
+filter: grayscale(0) brightness(0.9);
+}
+.heroAvatars a{
+color: rgb(var(--color));
+border-bottom: 1px solid rgb(var(--color));
+display: flex;
+align-items: center;
+margin-left: 1rem;
+font-size: 14px;
+}
+.heroAvatars a svg{
+width: 16px;
+margin-left: 5px;
+}
+
+
+.heroCardsDiv{
+display: flex;
+width: 100%;
+overflow-x: auto;
+gap: 1rem;
+flex-wrap: nowrap;
+align-items: center;
+justify-content: flex-start;
+margin: 4rem auto 0 auto;
+padding: 1rem;
+}
+.heroCard{
+width: 90%;
+max-width: 300px;
+min-width: 250px;
+background: var(--fade);
+border-radius: 10px;
+padding: 1rem;
+text-align: left;
+border: 1px solid rgba(var(--color),0.1);
+}
+.heroCard span{
+display: flex;
+flex-direction: column;
+}
+.heroCard span svg{
+width: 40px;
+height: 40px;
+color: rgba(var(--theme));
+background: rgba(var(--color),0.05);
+padding: 10px;
+border-radius: 5px;
+}
+.heroCard span h2{
+font-size: 20px;
+color: rgba(var(--color));
+margin-top: 1rem;
+}
+.heroCard p{
+background: transparent;
+border-radius: 0;
+margin: 0;
+padding: 0;
+border: none;
+margin-top: 10px;
+line-height: 1.4;
+font-size: 14px;
+color: rgba(var(--color),0.8);
+white-space: wrap;
+width: 100%;
+}
+.heroCard button{
+width: 95%;
+display: flex;
+align-items: center;
+justify-content: space-between;
+border: none;
+border-top: 1px solid rgba(var(--color),0.2);
+background: transparent;
+margin: 2rem auto 0 auto;
+padding: 12px 0 5px 0;
+font-weight: 600;
+color: rgba(var(--color), 0.8);
+}
+.heroCard button svg{
+width: 25px;
+height: 25px;
+color: rgba(var(--background));
+background: rgba(var(--color));
+padding: 5px;
+border-radius: 100%;
+transition: all 0.3s;
+}
+.heroCard button:hover svg{
+width: 40px;
+height: 25px;
+border-radius: 50px;
+text-align: right;
+}
+
+
+/* Second Section */
+.secondSection{
+width: 100%;
+padding: 0 1rem;
+display: flex;
+flex-direction: column;
+align-items: center;
+margin: 5rem auto 0 auto;
+}
+.secondSectionDiv{
+width: 100%;
+display: flex;
+flex-direction: column;
+}
+@media (min-width: 768px){
+  .secondSection{
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .secondSectionDiv{
+    width: 40%;
+  }
+}
+

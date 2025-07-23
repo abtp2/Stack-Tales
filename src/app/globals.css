@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Russo+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Changa+One:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root{
+  --dbg: 24,30,42;
+  --lbg: 242,246,249;
+  --dcolor: 255,255,255;
+  --lcolor: 0,0,0;
+  --dfade: rgb(46,55,72);
+  --lfade: rgb(250,250,250); 
+  --dlines: rgba(var(--theme),0.3);
+  --llines: rgba(var(--theme),0.5);
+  --theme: 42,138,240;
+}
+.light{
+  --background: var(--lbg);
+  --color: var(--lcolor);
+  --fade: var(--lfade);
+  --lines: var(--llines);
+}
+.dark{
+  --background: var(--dbg);
+  --color: var(--dcolor);
+  --fade: var(--dfade);
+  --lines: var(--dlines);
+}
+@media(prefers-color-scheme: dark){
+  html{
+  --background: var(--dbg);
+  --color: var(--dcolor);
+  --fade: var(--dfade);
+  --lines: var(--dlines);
+  }
+}
+@media(prefers-color-scheme: light){
+  html{
+  --background: var(--lbg);
+  --color: var(--lcolor);
+  --fade: var(--lfade);
+  --lines: var(--llines);
+  }
+}
+
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: rgb(var(--color));
+  background: rgb(var(--background));
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  /* outline: 1px solid red !important; */
+}
+::selection{
+  color: rgb(var(--dcolor));
+  background: rgb(var(--theme));
+}
+::placeholder{
+  color: rgba(var(--color),0.6);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,img {
+  user-select: none;
+}
+
+section{
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.overflow-none{
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.overflow-none::-webkit-scrollbar{
+  display: none; /* Chrome, Safari, and Opera */
+}
