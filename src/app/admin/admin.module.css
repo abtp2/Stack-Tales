@@ -14,7 +14,7 @@ align-items: center;
 justify-content: space-between;
 gap: 10px;
 padding: 5px;
-border: 1px solid rgba(var(--color),0.6);
+border: 1px solid rgba(var(--color),0.2);
 border-radius: 40px;
 white-space: nowrap;
 }
@@ -45,9 +45,11 @@ padding: 10px;
 margin: 2rem auto 1rem auto;
 border-radius: 5px;
 border: 1px solid rgba(var(--lcolor),0.1);
+box-shadow: 0 4px 6px -1px rgba(var(--lcolor),0.05),
+            0 2px 4px -1px rgba(var(--lcolor),0.05);
 }
-.options p{
-padding: 10px;
+.options button{
+padding: 9px 10px;
 display: flex;
 align-items: center;
 gap: 8px;
@@ -59,8 +61,9 @@ font-size: 14px;
 user-select: none;
 outline: 1px solid rgba(var(--color),0.1);
 opacity: 0.7;
+border: none;
 }
-.options p:hover{
+.options button:hover{
 background: rgba(var(--background),1);
 outline: 1px solid rgba(var(--color),0.2);
 opacity: 1;
@@ -70,7 +73,7 @@ background: rgba(var(--background),1) !important;
 outline: 1px solid rgba(var(--color),0.2) !important;
 opacity: 1 !important;
 }
-.options p svg{
+.options button svg{
 width: 18px;
 height: 18px;
 color: rgb(var(--theme));
@@ -83,6 +86,8 @@ padding: 10px;
 margin: 0 auto;
 border-radius: 5px;
 border: 1px solid rgba(var(--lcolor),0.1);
+box-shadow: 0 4px 6px -1px rgba(var(--lcolor),0.05),
+            0 2px 4px -1px rgba(var(--lcolor),0.05);
 }
 
 
@@ -380,5 +385,84 @@ max-width: 100% !important;
     margin-top: 0;
   }
 }
+
+
+
+
+
+
+/* ADMIN AUTH BOX */
+.adminAuth{
+width: 90%;
+max-width: 400px;
+display: flex;
+flex-direction: column;
+padding: 1rem;
+border-radius: 5px;
+background: var(--fade);
+position: absolute;
+top: 10%;
+left: 50%;
+transform: translateX(-50%);
+border: 1px solid rgba(var(--lcolor),0.1);
+box-shadow: 0 4px 6px -1px rgba(var(--lcolor),0.05),
+            0 2px 4px -1px rgba(var(--lcolor),0.05);
+}
+.adminAuth form{
+width: 100%;
+display: flex;
+flex-direction: column;
+margin-top: 1rem;
+background: rgba(var(--background));
+border-radius: 5px;
+padding: 1rem;
+}
+.adminAuth form p{
+font-size: 14px;
+opacity: 0.8;
+font-weight: 600;
+}
+.adminAuth form input{
+padding: 14px 1rem;
+border-radius: 5px;
+background: var(--fade);
+color: rgba(var(--color));
+margin-top: 6px;
+margin-bottom: 1rem;
+border: none;
+outline: none;
+border: 1px solid rgba(var(--color),0.1);
+}
+.adminAuth form button{
+width: 100px;
+padding: 10px 0;
+border-radius: 5px;
+background: var(--fade);
+color: rgba(var(--color));
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 5px;
+margin-top: 1rem;
+border: none;
+outline: none;
+font-size: 14px;
+border: 2px solid rgba(var(--color),0.05);
+}
+.adminAuth form button:hover{
+background: rgba(var(--background));
+}
+.adminAuth .error{
+width: 100%;
+border-radius: 5px;
+padding: 5px 8px;
+background: rgba(255,0,0,0.2);
+border: 2px solid rgba(var(--color),0.05);
+margin: 4px auto;
+color: rgba(255,0,0,0.8);
+font-size: 14px;
+}
+
+
 
 
