@@ -127,9 +127,36 @@ color: rgb(var(--theme));
 .blogTools button svg{
 
 }
+.createBlog .createBlogTitle{
+width: 100%;
+display: flex;
+align-items: center;
+justify-content: flex-start;
+flex-wrap: wrap;
+}
+.createBlogTitle input, .createBlogTitle select{
+width: 100%;
+height: 45px;
+outline: none;
+border: none;
+background: rgb(var(--background));
+color: rgb(var(--color));
+border-radius: 5px;
+padding: 0 1rem;
+resize: none;
+margin-top: 5px;
+font-size: 14px;
+}
+.createBlogTitle select option{
+width: 100%;
+height: 20px;
+padding: 5px 10px;
+background: var(--fade);
+color: rgba(var(--color));
+}
 .createBlog .blogCode{
 width: 100%;
-min-height: 600px;
+height: 550px;
 outline: none;
 border: none;
 background: rgb(var(--background));
@@ -138,6 +165,32 @@ border-radius: 5px;
 padding: 1rem;
 resize: none;
 margin-top: 5px;
+font-family: "Inter", sans-serif;
+font-size: 14px;
+}
+.createBlog .createBlogButtons{
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.createBlogButtons button{
+height: 35px;
+margin-top: 5px;
+padding: 0 14px;
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 14px;
+color: rgba(var(--dcolor),0.8);
+background: rgba(var(--theme));
+border: 1.5px solid rgba(var(--dcolor),0.2);
+border-radius: 5px;
+}
+.createBlogButtons button:nth-of-type(1){
+  color: rgba(var(--color),0.8);
+background: rgba(var(--background));
+outline: 1.5px solid rgba(var(--dcolor),0.2);
+border: 1.5px solid rgba(var(--lcolor),0.2);
 }
 .previewTabs{
 width: 100%;
@@ -167,9 +220,10 @@ color: rgb(var(--theme)) !important;
 }
 .previewBox,.AIBox{
 width: 100%;
-min-height: 600px;
+height: 700px;
 display: flex;
 flex-direction: column;
+flex-grow: 1;
 background: rgb(var(--background));
 color: rgb(var(--color));
 border-radius: 5px;
@@ -178,7 +232,7 @@ margin-top: 5px;
 }
 .AIBoxMessageBox{
 width: 100%;
-height: calc(600px - 80px);
+height: calc(100% - 80px);
 display: flex;
 flex-direction: column;
 flex-grow: 1;
@@ -434,8 +488,9 @@ outline: none;
 border: 1px solid rgba(var(--color),0.1);
 }
 .adminAuth form button{
-width: 100px;
-padding: 10px 0;
+width: fit-content;
+min-width: 100px;
+padding: 10px;
 border-radius: 5px;
 background: var(--fade);
 color: rgba(var(--color));
@@ -449,9 +504,6 @@ outline: none;
 font-size: 14px;
 border: 2px solid rgba(var(--color),0.05);
 }
-.adminAuth form button:hover{
-background: rgba(var(--background));
-}
 .adminAuth .error{
 width: 100%;
 border-radius: 5px;
@@ -464,5 +516,131 @@ font-size: 14px;
 }
 
 
+
+/* Admin Dashbox */
+.dashboxBlur > *:not(nav){
+filter: blur(1px);
+pointer-events: none;
+}
+.adminDashbox{
+width: 80%;
+max-width: 400px;
+padding: 1rem;
+border-radius: 20px 0 20px 20px;
+background: var(--fade);
+position: absolute;
+z-index: 4;
+top: 70px;
+right: 40px;
+border: 1px solid rgba(var(--color),0.2);
+box-shadow: -1px 2px 2px rgba(var(--lcolor),0.05);
+transform: scale(0);
+transform-origin: right top;
+transition: transform 0.2s ease-in-out;
+}
+.adminDashbox .dashboxData{
+width: 100%;
+display: flex;
+align-items: center;
+gap: 1rem;
+margin-bottom: .8rem;
+}
+.adminDashbox .dashboxData span{
+width: fit-content;
+display: flex;
+align-items: flex-end;
+position: relative;
+}
+.adminDashbox .dashboxData span:nth-of-type(2){
+flex-direction: column;
+align-items: flex-start;
+padding-left: 10px;
+}
+.adminDashbox .dashboxData span h1{
+font-size: 16px;
+opacity: 0.9;
+word-break: break-all;
+}
+.adminDashbox .dashboxData span p{
+font-size: 14px;
+opacity: 0.7;
+margin-top: 2px;
+word-break: break-all;
+}
+.adminDashbox .dashboxData span img{
+width: 60px;
+height: 60px;
+border-radius: 100%;
+border: 1px solid rgba(var(--color),0.3);
+padding: 5px;
+}
+.adminDashbox .dashboxData span svg{
+width: 25px;
+height: 25px;
+padding: 5px;
+border-radius: 100%;
+border: 1px solid rgba(var(--color),0.3);
+margin-left: -15px;
+background: var(--fade);
+position: absolute;
+bottom: 0;
+right: -10px;
+}
+.adminDashbox .dashboxForm{
+width: 96%;
+margin: 0 auto;
+display: flex;
+flex-direction: column;
+}
+.adminDashbox .dashboxForm fieldset{
+width: 100%;
+margin: 12px auto 0 auto;
+border: 1.5px solid rgba(var(--color),0.1);
+border-radius: 5px;
+padding: 0 10px;
+}
+.adminDashbox .dashboxForm fieldset legend{
+margin-left: 2px;
+padding: 0 2px;
+color: rgba(var(--color),0.6);
+font-size: 14px;
+}
+.adminDashbox .dashboxForm fieldset input{
+width: 100%;
+height: 100%;
+color: rgba(var(--color));
+outline: none;
+padding: 9px 0;
+border: none;
+background: transparent;
+opacity: 0.85;
+font-size: 14px;
+user-select: none !important;
+}
+.adminDashbox .dashboxForm span{
+margin-top: 1rem;
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+gap: 8px;
+}
+.adminDashbox .dashboxForm span button{
+min-width: 80px;
+padding: 9px 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+outline: 1.5px solid rgba(var(--dcolor),0.15);
+border: 1.5px solid rgba(var(--lcolor),0.1);
+border-radius: 6px;
+background: rgba(var(--background));
+color: rgba(var(--color),0.7);
+}
+.adminDashbox .logoutButton{
+background: rgba(255,0,0,0.1) !important;
+border-color: rgba(255,0,0,0.15) !important;
+outline: none !important;
+}
 
 

@@ -1,5 +1,5 @@
 "use client";
-import { LuLogIn } from "react-icons/lu";
+import { LuLogIn,LuLoaderCircle } from "react-icons/lu";
 import Logo from "@/components/layout/Logo";
 import Styles from "@/app/admin/admin.module.css";
 import { useState, useEffect } from 'react';
@@ -65,10 +65,10 @@ const AdminAuth: React.FC<AdminAuthProps> = ({ onLogin }) => {
         {error && (
             <div className={Styles.error}>{error}</div>
           )}
-        <button type="submit" disabled={loading}>{loading ? 'Logging in...' : (<>Login <LuLogIn/></>)}</button>
+        <button type="submit" disabled={loading}>{loading ? (<><LuLoaderCircle className="LoaderSpin"/> Logging in..</>) : (<>Login <LuLogIn/></>)}</button>
       </form>
     </div>
   );
 }
 
-export default AdminAuth
+export default AdminAuth;
