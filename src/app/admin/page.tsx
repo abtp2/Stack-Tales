@@ -1,7 +1,7 @@
 "use client";
 import AdminPanel from "@/components/admin/AdminPanel";
 import AdminAuth from "@/components/admin/AdminAuth";
-import {useState, useEffect} from "react";
+import {useState, useEffect, FC} from "react";
 import {LuLoaderCircle} from "react-icons/lu";
 interface Admin {
   id: string;
