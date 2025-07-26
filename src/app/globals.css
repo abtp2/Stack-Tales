@@ -97,6 +97,20 @@ section{
 .overflow-none::-webkit-scrollbar{
   display: none; /* Chrome, Safari, and Opera */
 }
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: var(--fade);
+  border-radius: 100px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--background));
+  border-radius: 100px;
+  border-left: 2px solid var(--fade);
+  border-right: 4px solid rgba(var(--background));
+}
+
 .LoaderSpin{
 animation: spin 1s linear infinite;
 }

@@ -30,7 +30,7 @@ interface BlogEditorProps {
   adminId?: string; // Admin ID to fetch admin data
 }
 
-const BlogEditor: React.FC<BlogEditorProps> = ({ 
+const BlogEditor: FC<BlogEditorProps> = ({ 
   blogContent, 
   setBlogContent, 
   onContentChange,
@@ -129,22 +129,22 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
 
   const handleSave = async () => {
     if (!blogTitle.trim()) {
-      setMessage('Please enter a blog title');
+      setMessage('Error : Please enter a blog title');
       return;
     }
     
     if(adminId && (adminId != adminDataID)){
-      setMessage("You cannot edit any other admin's blog");
+      setMessage("Error : You cannot edit any other admin's blog");
       return;
     }
 
     if (!blogContent.trim()) {
-      setMessage('Please enter blog content');
+      setMessage('Error : Please enter blog content');
       return;
     }
 
     if (!adminDataID) {
-      setMessage('Admin data not loaded. Please try again.');
+      setMessage('Error : Admin data not loaded. Please try again.');
       return;
     }
 
@@ -212,12 +212,6 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
     <div className={Styles.createBlogDiv}>
       <BlogToolbar textareaRef={textareaRef} />
       
-      {message && (
-        <div className={`${Styles.message} ${message.includes('Error') ? Styles.error : Styles.success}`}>
-          {message}
-        </div>
-      )}
-      
       <div className={Styles.createBlogTitle}>
         <input 
           type="text" 
@@ -251,6 +245,12 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
         onChange={onContentChange}
         disabled={isSaving}
       />
+      
+      {message && (
+        <div className={`${Styles.message} ${message.includes('Error') ? Styles.error : Styles.success}`}>
+          {message}
+        </div>
+      )}
       
       <span className={Styles.createBlogButtons}>
         <button 

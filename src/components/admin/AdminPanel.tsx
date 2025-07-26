@@ -4,6 +4,7 @@ import Logo from "@/components/layout/Logo";
 import AdminDashbox from "@/components/admin/AdminDashbox";
 import AdminNavigation from "./AdminNavigation";
 import CreateBlog from "./CreateBlog";
+import AllBlogs from "./AllBlogs";
 import { useAI } from "@/hooks/useAI";
 import { loadBlogContentFromStorage, saveBlogContentToStorage } from "@/utils/blogStorage";
 import { Admin, TabType, PreviewTabType } from "@/types/admin";
@@ -122,7 +123,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
           />
         );
       case "addBlog":
-        return <div>All Blogs Content - Coming Soon</div>;
+        return (
+          <AllBlogs/>
+        );
       case "analytics":
         return <div>Analytics Content - Coming Soon</div>;
       case "settings":
