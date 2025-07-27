@@ -1,7 +1,8 @@
 import { useState, useEffect, FC, ChangeEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Styles from "@/app/admin/admin.module.css";
-import {LuExternalLink} from "react-icons/lu";
+import {LuExternalLink, LuPencil, LuTrash} from "react-icons/lu";
+import { TabType } from "@/types/admin";
 
 interface Admin {
   id: string;
@@ -20,7 +21,19 @@ interface Blog {
   admins?: Admin | Admin[]; // For raw data from Supabase
 }
 
-const AllBlogs = () => {
+interface AllBlogsProps {
+  blogId: string | null;
+  setBlogId: React.Dispatch<React.SetStateAction<string | null>>;
+  tab: TabType;
+  setTab: React.Dispatch<React.SetStateAction<TabType>>;
+}
+
+const AllBlogs: FC<AllBlogsProps> = ({
+  blogId,
+  setBlogId,
+  tab,
+  setTab
+}) => {
   const supabase = createClient();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [totalBlogs, setTotalBlogs] = useState<number>(0);
@@ -34,27 +47,33 @@ const AllBlogs = () => {
   const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<Blog[]>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  
+  const [currentAdminId, setCurrentAdminId] = useState<string>("");
   const BLOGS_PER_PAGE = 6;
-
+  
+  const fetchCurrentAdminId = () =>{
+    try{
+      const session = localStorage.getItem('admin_session');
+      if (session) {
+        const sessionData = JSON.parse(session);
+        setCurrentAdminId(sessionData.id);
+      }
+    } catch (error){
+      console.error("Error fetching current admin ID");
+    }
+  }
   const fetchBlogNumber = async () => {
     try {
       setLoading(true);
       const { count, error } = await supabase
         .from('blogs')
         .select('*', { count: 'exact', head: true });
-        
       if (error) throw error;
-      
       if (count !== null) {
         setTotalBlogs(count);
-        
         const initialRangeTo = Math.min(BLOGS_PER_PAGE - 1, count - 1);
         setRangeTo(initialRangeTo);
-        
         console.log("Total Blogs: " + count);
         console.log("Initial range: 0 to " + initialRangeTo);
-        
         await fetchInitialBlogData(0, initialRangeTo, count);
       }
     } catch (error) {
@@ -67,7 +86,6 @@ const AllBlogs = () => {
   const fetchInitialBlogData = async (from: number, to: number, totalCount: number) => {
     try {
       console.log(`Fetching initial blogs from ${from} to ${to}`);
-      
       const { data, error } = await supabase
         .from('blogs')
         .select(`id, title, content, series_id, author_id, created_at,
@@ -78,20 +96,15 @@ const AllBlogs = () => {
           )`)
         .range(from, to)
         .order('created_at', { ascending: false });
-        
       if (error) throw error;
-      
       if (data) {
         console.log(`Fetched ${data.length} blogs`);
-        
         const blogsWithAdmin = data.map(blog => ({
           ...blog,
           admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
         }));
-        
         setBlogs(blogsWithAdmin);
         setHasMore((to + 1) < totalCount);
-        
         console.log(`Has more blogs: ${(to + 1) < totalCount}`);
       }
     } catch (error) {
@@ -102,7 +115,6 @@ const AllBlogs = () => {
   const fetchBlogData = async (from: number, to: number) => {
     try {
       console.log(`Fetching blogs from ${from} to ${to}`);
-      
       const { data, error } = await supabase
         .from('blogs')
         .select(`id, title, content, series_id, author_id, created_at,
@@ -113,20 +125,15 @@ const AllBlogs = () => {
           )`)
         .range(from, to)
         .order('created_at', { ascending: false });
-        
       if (error) throw error;
-      
       if (data) {
         console.log(`Fetched ${data.length} more blogs`);
-        
         const blogsWithAdmin = data.map(blog => ({
           ...blog,
           admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
         }));
-        
         setBlogs(prevBlogs => [...prevBlogs, ...blogsWithAdmin]);
         setHasMore(to < totalBlogs - 1);
-        
         console.log(`Has more blogs after loading: ${to < totalBlogs - 1}`);
       }
     } catch (error) {
@@ -142,7 +149,6 @@ const AllBlogs = () => {
       setSearchResults([]);
       return;
     }
-
     try {
       setSearchLoading(true);
       setIsSearchMode(true);
@@ -294,10 +300,20 @@ const AllBlogs = () => {
       setLoading(false);
     }
   };
+  
+  const EditBlog = (x)=> {
+    try{
+      setTab("createBlog");
+      setBlogId(x);
+    } catch (error){
+      console.error("Error in editing blog");
+    }
+  }
 
   // Load blogs on component mount
   useEffect(() => {
     fetchBlogNumber();
+    fetchCurrentAdminId();
   }, []);
 
   // Determine which blogs to display
@@ -344,14 +360,23 @@ const AllBlogs = () => {
           </h2>
           {displayLoading && displayBlogs.length === 0 ? (
             <div className={Styles.AllBlogsLoading}>
-              {isSearchMode ? 'Searching...' : 'Loading blogs...'}
+              {isSearchMode ? '' : 'Loading blogs...'}
             </div>
           ) : (
             <>
               <div className={Styles.AllBlogsList}>
                 {displayBlogs.map((blog) => (
                   <div key={blog.id} className={Styles.AllBlogsCard}>
-                    <LuExternalLink className={Styles.AllBlogsCardOpen}/>
+                    <div className={Styles.AllBlogsCardTools}>
+                      <LuExternalLink className={Styles.AllBlogsCardOpen}/>
+                      {(currentAdminId==blog.admin.id) && (
+                      <>
+                        <LuPencil onClick={()=>{EditBlog(blog.id)}}/>
+                        <LuTrash/>
+                      </>
+                      )}
+                    </div>
+                    
                     <span className={Styles.AllBlogsCardHeader}>
                       {blog.admin?.avatar_url && (
                         <img 
@@ -367,8 +392,6 @@ const AllBlogs = () => {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
                           })}
                         </p>
                       </h1>

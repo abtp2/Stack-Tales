@@ -2,8 +2,9 @@
 import { ChangeEvent, useState, useRef, useEffect } from "react";
 import { createClient } from '@/lib/supabase/client';
 import BlogToolbar from "./BlogToolbar";
+import TagInput from "./TagInput";
 import Styles from "@/app/admin/admin.module.css";
-import { LuSave, LuEraser } from "react-icons/lu";
+import { LuSave, LuExternalLink, LuEraser } from "react-icons/lu";
 
 interface AdminData {
   id: string;
@@ -23,26 +24,32 @@ interface Series {
 }
 
 interface BlogEditorProps {
+  blogId?: string | null; // Optional for editing existing blogs
+  setBlogId: React.Dispatch<React.SetStateAction<string | null>>;
+  blogTitle: string;
+  setBlogTitle: React.Dispatch<React.SetStateAction<string>>;
+  blogSeries: string | null;
+  setBlogSeries: React.Dispatch<React.SetStateAction<string | null>>;
   blogContent: string;
   setBlogContent: React.Dispatch<React.SetStateAction<string>>;
-  onContentChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-  blogId?: string; // Optional for editing existing blogs
   adminId?: string; // Admin ID to fetch admin data
 }
 
-const BlogEditor: FC<BlogEditorProps> = ({ 
+const BlogEditor: FC<BlogEditorProps> = ({
+  blogId,
+  setBlogId,
+  blogTitle,
+  setBlogTitle,
+  blogSeries,
+  setBlogSeries,
   blogContent, 
   setBlogContent, 
-  onContentChange,
-  blogId,
   adminId
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const supabase = createClient();
   
   // State management
-  const [blogTitle, setBlogTitle] = useState<string>("");
-  const [blogSeries, setBlogSeries] = useState<string>("");
   const [series, setSeries] = useState<Series[]>([]);
   const [adminDataID, setAdminDataID] = useState<AdminData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -159,7 +166,6 @@ const BlogEditor: FC<BlogEditorProps> = ({
         author_id: adminDataID,
         updated_at: new Date().toISOString(),
       };
-
       let result;
       
       if (blogId) {
@@ -191,7 +197,7 @@ const BlogEditor: FC<BlogEditorProps> = ({
       setTimeout(() => setMessage(''), 3000);
       
     } catch (error) {
-      console.error('Error saving blog:', error);
+      console.error('Error saving blog:', JSON.stringify(error));
       setMessage('Error saving blog. Please try again.');
     } finally {
       setIsSaving(false);
@@ -206,23 +212,39 @@ const BlogEditor: FC<BlogEditorProps> = ({
       setMessage('');
     }
   };
-
+  
+  const CancelEditBlog = ()=> {
+    try{
+      setBlogId("");
+      setBlogTitle("");
+      setBlogSeries("");
+      setBlogContent("");
+    } catch (error){
+      console.error("Error in cancelling blog editing");
+    }
+  }
 
   return (
     <div className={Styles.createBlogDiv}>
+      {(blogId) && (
+      <span className={Styles.createBlogEditingBlog}>
+        <h1>Editing: <p>{blogTitle}</p> <LuExternalLink/> <button onClick={()=>{CancelEditBlog()}}>Cancel</button></h1>
+      </span>
+      )}
+
       <BlogToolbar textareaRef={textareaRef} />
-      
       <div className={Styles.createBlogTitle}>
         <input 
           type="text" 
           placeholder="Write Title for blog" 
           value={blogTitle} 
-          onChange={(e) => setBlogTitle(e.target.value)}
+          onChange={(e) => {setBlogTitle(e.target.value)}}
           disabled={isSaving}
+          className={Styles.createBlogTitleInput}
         />
-        
-        <select 
-          value={blogSeries} 
+        <span className={Styles.createBlogSelectAndTags}>
+          <select 
+          value={blogSeries == null ? "" : blogSeries} 
           onChange={(e) => setBlogSeries(e.target.value)} 
           name="series"
           disabled={isLoading || isSaving}
@@ -234,6 +256,8 @@ const BlogEditor: FC<BlogEditorProps> = ({
             </option>
           ))}
         </select>
+        <TagInput/>
+        </span>
       </div>
       
       <textarea 
@@ -242,7 +266,7 @@ const BlogEditor: FC<BlogEditorProps> = ({
         placeholder="Start writing a blog..."
         aria-label="Blog content editor"
         value={blogContent}
-        onChange={onContentChange}
+        onChange={(e)=>{setBlogContent(e.target.value)}}
         disabled={isSaving}
       />
       

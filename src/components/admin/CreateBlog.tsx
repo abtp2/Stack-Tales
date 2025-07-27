@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEvent, KeyboardEvent } from "react";
+import { ChangeEvent, KeyboardEvent, FC } from "react";
 import BlogEditor from "./BlogEditor";
 import PreviewTabs from "./PreviewTabs";
 import PreviewBox from "./PreviewBox";
@@ -8,9 +8,14 @@ import { ChatMessage, PreviewTabType } from "@/types/admin";
 import Styles from "@/app/admin/admin.module.css";
 
 interface CreateBlogProps {
+  blogId?: string | null; // Optional for editing existing blogs
+  setBlogId: React.Dispatch<React.SetStateAction<string | null>>;
+  blogTitle: string;
+  setBlogTitle: React.Dispatch<React.SetStateAction<string>>;
+  blogSeries: string | null;
+  setBlogSeries: React.Dispatch<React.SetStateAction<string | null>>;
   blogContent: string;
   setBlogContent: React.Dispatch<React.SetStateAction<string>>;
-  onBlogContentChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   previewTab: PreviewTabType;
   onPreviewTabChange: (tab: PreviewTabType) => void;
   components: ChatMessage[];
@@ -21,10 +26,15 @@ interface CreateBlogProps {
   handleSendMessage: () => void;
 }
 
-const CreateBlog: React.FC<CreateBlogProps> = ({
-  blogContent,
+const CreateBlog: FC<CreateBlogProps> = ({
+  blogId,
+  setBlogId,
+  blogTitle,
+  setBlogTitle,
+  blogSeries,
+  setBlogSeries,
+  blogContent, 
   setBlogContent,
-  onBlogContentChange,
   previewTab,
   onPreviewTabChange,
   components,
@@ -32,14 +42,19 @@ const CreateBlog: React.FC<CreateBlogProps> = ({
   inputText,
   handleInputChange,
   handleKeyPress,
-  handleSendMessage
+  handleSendMessage,
 }) => {
   return (
     <div className={Styles.createBlog}>
       <BlogEditor 
+        blogId={blogId}
+        setBlogId={setBlogId}
+        blogTitle={blogTitle}
+        setBlogTitle={setBlogTitle}
+        blogSeries={blogSeries}
+        setBlogSeries={setBlogSeries}
         blogContent={blogContent}
         setBlogContent={setBlogContent}
-        onContentChange={onBlogContentChange}
       />
       <div className={Styles.createBlogDiv}>
         <PreviewTabs 

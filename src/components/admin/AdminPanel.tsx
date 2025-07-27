@@ -6,7 +6,7 @@ import AdminNavigation from "./AdminNavigation";
 import CreateBlog from "./CreateBlog";
 import AllBlogs from "./AllBlogs";
 import { useAI } from "@/hooks/useAI";
-import { loadBlogContentFromStorage, saveBlogContentToStorage } from "@/utils/blogStorage";
+import { loadBlogContentFromStorage, saveBlogContentToStorage, denounce } from "@/utils/blogStorage";
 import { Admin, TabType, PreviewTabType } from "@/types/admin";
 import { createClient } from '@/lib/supabase/client';
 import Styles from "@/app/admin/admin.module.css";
@@ -21,9 +21,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
   const [previewTab, setPreviewTab] = useState<PreviewTabType>("preview");
   const [userDashbox, setUserDashbox] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>("");
+  const [blogId, setBlogId] = useState<string | null>(null);
+  const [blogTitle, setBlogTitle] = useState<string>("");
+  const [blogSeries, setBlogSeries] = useState<string>("");
   const [blogContent, setBlogContent] = useState<string>("");
   const [adminAvatarUrl, setAdminAvatarUrl] = useState<string>("");
-  
   const { aiLoading, components, generateText, addUserMessage } = useAI();
   const supabase = createClient();
 
@@ -66,19 +68,42 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
 
     loadAdminAvatar();
   }, [admin?.id, supabase]);
-
+  
+  function debounce(func: (...args: any[]) => void, delay: number) {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    return (...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  }
+  
   // Load blog content from localStorage on component mount
   useEffect(() => {
     const savedContent = loadBlogContentFromStorage();
     if (savedContent) {
-      setBlogContent(savedContent);
+      setBlogId(savedContent.id)
+      setBlogTitle(savedContent.title);
+      setBlogSeries(savedContent.series_id);
+      setBlogContent(savedContent.content);
     }
   }, []);
 
-  // Save blog content to localStorage whenever it changes
+  // Save blog content to localStorage whenever it changesuseEffect(() => {
   useEffect(() => {
-    saveBlogContentToStorage(blogContent);
-  }, [blogContent]);
+  const debouncedSave = debounce(() => {
+      const blog = {
+        id: blogId,
+        title: blogTitle,
+        content: blogContent,
+        series_id: blogSeries
+      };
+      saveBlogContentToStorage(blog);
+    }, 500);
+    debouncedSave();
+  }, [blogId, blogTitle, blogContent, blogSeries]);
+  
 
   const handleSendMessage = useCallback((): void => {
     const trimmedInput = inputText.trim();
@@ -100,18 +125,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
     }
   }, [handleSendMessage]);
 
-  const handleBlogContentChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>): void => {
-    setBlogContent(e.target.value);
-  }, []);
 
   const renderTabContent = (): JSX.Element | null => {
     switch (tab) {
       case "createBlog":
         return (
           <CreateBlog
+            blogId={blogId}
+            setBlogId={setBlogId}
+            blogTitle={blogTitle}
+            setBlogTitle={setBlogTitle}
+            blogSeries={blogSeries}
+            setBlogSeries={setBlogSeries}
             blogContent={blogContent}
             setBlogContent={setBlogContent}
-            onBlogContentChange={handleBlogContentChange}
             previewTab={previewTab}
             onPreviewTabChange={setPreviewTab}
             components={components}
@@ -124,7 +151,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
         );
       case "addBlog":
         return (
-          <AllBlogs/>
+          <AllBlogs 
+            blogId={blogId}
+            setBlogId={setBlogId}
+            tab={tab}
+            setTab={setTab}
+          />
         );
       case "analytics":
         return <div>Analytics Content - Coming Soon</div>;
