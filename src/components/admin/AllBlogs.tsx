@@ -308,7 +308,39 @@ const AllBlogs: FC<AllBlogsProps> = ({
     } catch (error){
       console.error("Error in editing blog");
     }
-  }
+  };
+  
+  const DeleteBlog = async (x) => {
+    try {
+      const confirmDelete = window.confirm("Are you sure you want to delete this blog?");
+      if (!confirmDelete) {
+        alert("Blog deletion cancelled.");
+        return;
+      }
+      const promptInput = window.prompt('Type "StackTales" to delete this blog permanently.');
+      if (promptInput !== "StackTales") {
+        alert('Blog not deleted. You must type "StackTales" exactly.');
+        return;
+      }
+      const { error } = await supabase
+        .from('blogs')
+        .delete()
+        .eq('id', x);
+      if (error) throw error;
+      alert("Blog deleted successfully.");
+      if (isSearchMode) {
+        await searchBlogs(searchTerm);
+      } else {
+        setBlogs([]);
+        setRangeFrom(0);
+        setRangeTo(0);
+        await fetchBlogNumber();
+      }
+    } catch (error) {
+      console.error("Error in deleting blog:", error.message);
+      alert("An error occurred while deleting the blog.");
+    }
+  };
 
   // Load blogs on component mount
   useEffect(() => {
@@ -372,7 +404,7 @@ const AllBlogs: FC<AllBlogsProps> = ({
                       {(currentAdminId==blog.admin.id) && (
                       <>
                         <LuPencil onClick={()=>{EditBlog(blog.id)}}/>
-                        <LuTrash/>
+                        <LuTrash onClick={()=>{DeleteBlog(blog.id)}}/>
                       </>
                       )}
                     </div>

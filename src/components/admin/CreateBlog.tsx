@@ -14,6 +14,8 @@ interface CreateBlogProps {
   setBlogTitle: React.Dispatch<React.SetStateAction<string>>;
   blogSeries: string | null;
   setBlogSeries: React.Dispatch<React.SetStateAction<string | null>>;
+  blogTags: string[];
+  setBlogTags: React.Dispatch<React.SetStateAction<string[]>>;
   blogContent: string;
   setBlogContent: React.Dispatch<React.SetStateAction<string>>;
   previewTab: PreviewTabType;
@@ -33,6 +35,8 @@ const CreateBlog: FC<CreateBlogProps> = ({
   setBlogTitle,
   blogSeries,
   setBlogSeries,
+  blogTags,
+  setBlogTags,
   blogContent, 
   setBlogContent,
   previewTab,
@@ -53,6 +57,8 @@ const CreateBlog: FC<CreateBlogProps> = ({
         setBlogTitle={setBlogTitle}
         blogSeries={blogSeries}
         setBlogSeries={setBlogSeries}
+        blogTags={blogTags}
+        setBlogTags={setBlogTags}
         blogContent={blogContent}
         setBlogContent={setBlogContent}
       />
@@ -64,6 +70,12 @@ const CreateBlog: FC<CreateBlogProps> = ({
         <PreviewBox 
           style={{ display: previewTab === "preview" ? 'flex' : 'none' }}
           content={blogContent}
+          blogTitle={blogTitle}
+          setBlogTitle={setBlogTitle}
+          blogSeries={blogSeries}
+          setBlogSeries={setBlogSeries}
+          blogTags={blogTags}
+          setBlogTags={setBlogTags}
         />
         <AIBox 
           style={{ display: previewTab === "ai" ? 'flex' : 'none' }}

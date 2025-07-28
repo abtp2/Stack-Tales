@@ -30,6 +30,8 @@ interface BlogEditorProps {
   setBlogTitle: React.Dispatch<React.SetStateAction<string>>;
   blogSeries: string | null;
   setBlogSeries: React.Dispatch<React.SetStateAction<string | null>>;
+  blogTags: string[];
+  setBlogTags: React.Dispatch<React.SetStateAction<string[]>>;
   blogContent: string;
   setBlogContent: React.Dispatch<React.SetStateAction<string>>;
   adminId?: string; // Admin ID to fetch admin data
@@ -42,6 +44,8 @@ const BlogEditor: FC<BlogEditorProps> = ({
   setBlogTitle,
   blogSeries,
   setBlogSeries,
+  blogTags,
+  setBlogTags,
   blogContent, 
   setBlogContent, 
   adminId
@@ -116,7 +120,7 @@ const BlogEditor: FC<BlogEditorProps> = ({
     try {
       const { data, error } = await supabase
         .from('blogs')
-        .select('title, content, series_id')
+        .select('title, content, series_id, tags')
         .eq('id', blogId)
         .single();
 
@@ -126,6 +130,7 @@ const BlogEditor: FC<BlogEditorProps> = ({
         setBlogTitle(data.title);
         setBlogContent(data.content);
         setBlogSeries(data.series_id);
+        setBlogTags(data.tags);
       }
     } catch (error) {
       console.error('Error fetching blog:', error);
@@ -133,28 +138,33 @@ const BlogEditor: FC<BlogEditorProps> = ({
     }
   };
 
+  function slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[\s\-_]+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
 
   const handleSave = async () => {
     if (!blogTitle.trim()) {
       setMessage('Error : Please enter a blog title');
       return;
     }
-    
     if(adminId && (adminId != adminDataID)){
       setMessage("Error : You cannot edit any other admin's blog");
       return;
     }
-
     if (!blogContent.trim()) {
       setMessage('Error : Please enter blog content');
       return;
     }
-
     if (!adminDataID) {
       setMessage('Error : Admin data not loaded. Please try again.');
       return;
     }
-
     try {
       setIsSaving(true);
       setMessage('');
@@ -163,7 +173,9 @@ const BlogEditor: FC<BlogEditorProps> = ({
         title: blogTitle.trim(),
         content: blogContent,
         series_id: blogSeries || null,
+        tags: blogTags,
         author_id: adminDataID,
+        slug: slugify(blogTitle.trim()),
         updated_at: new Date().toISOString(),
       };
       let result;
@@ -174,6 +186,8 @@ const BlogEditor: FC<BlogEditorProps> = ({
           title: blogData.title,
           content: blogData.content,
           series_id: blogData.series_id,
+          tags: blogData.tags,
+          slug: slugify(blogData.title),
           updated_at: blogData.updated_at,
         };
         
@@ -209,7 +223,8 @@ const BlogEditor: FC<BlogEditorProps> = ({
       setBlogContent("");
       setBlogTitle("");
       setBlogSeries("");
-      setMessage('');
+      setBlogTags([]);
+      setMessage("");
     }
   };
   
@@ -218,6 +233,7 @@ const BlogEditor: FC<BlogEditorProps> = ({
       setBlogId("");
       setBlogTitle("");
       setBlogSeries("");
+      setBlogTags([])
       setBlogContent("");
     } catch (error){
       console.error("Error in cancelling blog editing");
@@ -256,13 +272,16 @@ const BlogEditor: FC<BlogEditorProps> = ({
             </option>
           ))}
         </select>
-        <TagInput/>
+        <TagInput
+        blogTags={blogTags}
+        setBlogTags={setBlogTags}
+        />
         </span>
       </div>
       
       <textarea 
         ref={textareaRef}
-        className={Styles.blogCode} 
+        className={`${Styles.blogCode} overflow-none`} 
         placeholder="Start writing a blog..."
         aria-label="Blog content editor"
         value={blogContent}

@@ -1,4 +1,3 @@
-
 .logo{
 display: flex;
 align-items: center;
@@ -38,7 +37,7 @@ border-bottom: 1px solid rgba(var(--color),0.2);
 display: flex;
 align-items: center;
 justify-content: center;
-gap: 2rem;
+gap: 1rem;
 }
 .sidebar{
 width: 70%;
@@ -67,30 +66,91 @@ border-bottom: 2px solid rgb(var(--theme));
 }
 .sidebar svg{
 width: 30px;
+height: 30px;
 position: absolute;
 top: 1rem;
 right: 1rem;
+padding: 5px;
+background: var(--fade);
+border-radius: 5px;
 }
 .searchIcon{
+width: 35px;
+height: 35px;
+padding: 8px;
+border-radius: 5px;
+}
+.menuIcon{
+width: 35px;
+height: 35px;
+padding: 8px;
+border-radius: 5px;
+}
+.menuIcon:hover, .searchIcon:hover{
+background: var(--fade);
+}
+
+.searchBox{
+position: absolute;
+z-index: 4;
+width: 95%;
+max-width: 700px;
+top: 70px;
+left: 50%;
+transform: translateX(-50%);
+background: var(--fade);
+display: flex;
+flex-direction: column;
+border-radius: 10px;
+overflow: hidden;
+border: 1px solid rgba(var(--color),0.15);
+box-shadow: rgba(var(--lcolor),0.1) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+}
+.searchBox .searchBoxInput{
+width: 100%;
+height: 45px;
+display: flex;
+flex-wrap: nowrap;
+align-items: center;
+gap: 12px;
+padding: 0 1rem;
+border-bottom: 1px solid rgba(var(--color),0.08);
+}
+.searchBoxInput svg{
+width: 20px;
+height: 20px;
+color: rgba(var(--color),0.8);
+}
+.searchBoxInput input{
+width: 100%;
+height: 100%;
+border: none;
+outline: none;
+background: transparent;
+font-size: 15px;
+color: rgba(var(--color));
+}
+.searchBoxResult{
+max-height: 160px;
+display: flex;
+flex-direction: column;
+overflow-y: auto;
+}
+.searchBoxResult p{
+width: 100%;
+min-height: 40px;
+max-height: 40px;
 display: flex;
 align-items: center;
 justify-content: space-between;
+padding: 0 1rem;
+border-bottom: 1px solid rgba(var(--color),0.08);
+font-size: 13px;
+color: rgba(var(--color),0.8);
+background: rgba(var(--background),0.6);
 }
-.searchIcon input{
-display: none;
-height: 100%;
-width: 100%;
-outline: none;
-border: none;
-background: transparent;
-color: rgb(var(--color));
-}
-.searchIcon svg{
-width: 20px;
-}
-.menuIcon{
-width: 24px;
-}
+
+
 @media (min-width: 768px){
   .sidebar{
     position: static;
@@ -110,27 +170,6 @@ width: 24px;
   }
   .menuIcon{
     display: none;
-  }
-  .searchIcon{
-    width: 200px;
-    height: 35px;
-    border: 1px solid rgba(var(--color),0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    padding: 0 1rem;
-  }
-  .searchIcon input{
-    display: block;
-    height: 100%;
-    width: 100%;
-    outline: none;
-    border: none;
-    background: transparent;
-    color: rgb(var(--color));
-  }
-  .searchIcon svg{
-    width: 16px;
-    margin-right: 10px;
   }
 }
 

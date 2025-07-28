@@ -34,7 +34,7 @@ width: 100%;
 .blogTitle span{
 display: flex;
 align-items: center;
-margin-top: 1rem;
+margin-top: 1.5rem;
 }
 .blogTitle span img{
 width: 50px;
@@ -96,6 +96,7 @@ width: 100%;
 margin: 2rem auto;
 line-height: 1.6;
 font-size: 15px;
+overflow: auto;
 }
 
 .blogContent h1 {
@@ -117,7 +118,6 @@ font-size: 15px;
 .blogContent ul,
 .blogContent ol {
   margin: 1rem 0 1rem 1.5rem;
-  padding-left: 1.5rem;
 }
 
 .blogContent li {

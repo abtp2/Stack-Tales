@@ -23,6 +23,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
   const [inputText, setInputText] = useState<string>("");
   const [blogId, setBlogId] = useState<string | null>(null);
   const [blogTitle, setBlogTitle] = useState<string>("");
+  const [blogTags, setBlogTags] = useState<string[]>(["JavaScript", "ReactJS"]);
   const [blogSeries, setBlogSeries] = useState<string>("");
   const [blogContent, setBlogContent] = useState<string>("");
   const [adminAvatarUrl, setAdminAvatarUrl] = useState<string>("");
@@ -86,6 +87,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
       setBlogId(savedContent.id)
       setBlogTitle(savedContent.title);
       setBlogSeries(savedContent.series_id);
+      setBlogTags(savedContent.tags);
       setBlogContent(savedContent.content);
     }
   }, []);
@@ -97,12 +99,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
         id: blogId,
         title: blogTitle,
         content: blogContent,
-        series_id: blogSeries
+        series_id: blogSeries,
+        tags: blogTags
       };
       saveBlogContentToStorage(blog);
     }, 500);
     debouncedSave();
-  }, [blogId, blogTitle, blogContent, blogSeries]);
+  }, [blogId, blogTitle, blogContent, blogSeries, JSON.stringify(blogTags)]);
   
 
   const handleSendMessage = useCallback((): void => {
@@ -137,6 +140,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
             setBlogTitle={setBlogTitle}
             blogSeries={blogSeries}
             setBlogSeries={setBlogSeries}
+            blogTags={blogTags}
+            setBlogTags={setBlogTags}
             blogContent={blogContent}
             setBlogContent={setBlogContent}
             previewTab={previewTab}

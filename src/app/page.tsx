@@ -4,9 +4,10 @@ import LatestBlogs from "@/components/layout/LatestBlogs";
 import TrendingTags from "@/components/layout/TrendingTags";
 import FeaturedSeries from "@/components/layout/FeaturedSeries";
 import Styles from "./main.module.css";
+import LayoutStyles from "@/components/layout/layout.module.css";
 import {LuSparkles, LuArrowRight, LuCode, LuFileText, LuWrench, LuActivity, LuUsers} from "react-icons/lu";
 
-export default function Home(){
+const Home =()=>{
 const heroCards = [
   {
     icon: <LuCode />,
@@ -48,37 +49,40 @@ const heroCards = [
 
   return (
     <>
-    <Navbar/>
-    <div className={Styles.hero}>
-      <section>
-        <p><LuSparkles className={Styles.sparkleIcon}/> Latest Dev Blogs</p>
-        <h1>DEMYSTIFYING <span>{"<CODE/>"} </span> AND STACKS WITH <RoughNotation>SIMPLICITY</RoughNotation></h1>
-        <div className={Styles.heroAvatars}>
-          {[...Array(6)].map((_, i) => (
-            <span key={i}>
-              <img src={`/avatar${i + 1}.jpg`} alt={`Avatar ${i + 1}`} />
-            </span>
-          ))}
-          <a href="">Join Community <LuArrowRight/></a>
-        </div>
-        <div className={`${Styles.heroCardsDiv} overflow-none`}>
-          {heroCards.map((card, index)=>(
-            <div className={Styles.heroCard} key={index}>
-              <span>{card.icon} <h2>{card.title}</h2></span>
-              <p>{card.description}</p>
-              <button>{card.cta} <LuArrowRight/></button>
-            </div>
+      <Navbar/>
+      <div className={Styles.hero}>
+        <section>
+          <p><LuSparkles className={Styles.sparkleIcon}/> Latest Dev Blogs</p>
+          <h1>DEMYSTIFYING <span>{"<CODE/>"} </span> AND STACKS WITH <RoughNotation>SIMPLICITY</RoughNotation></h1>
+          <div className={Styles.heroAvatars}>
+            {[...Array(6)].map((_, i) => (
+              <span key={i}>
+                <img src={`/avatar${i + 1}.jpg`} alt={`Avatar ${i + 1}`} />
+              </span>
             ))}
-        </div>
+            <a href="">Join Community <LuArrowRight/></a>
+          </div>
+          <div className={`${Styles.heroCardsDiv} overflow-none`}>
+            {heroCards.map((card, index)=>(
+              <div className={Styles.heroCard} key={index}>
+                <span>{card.icon} <h2>{card.title}</h2></span>
+                <p>{card.description}</p>
+                <button>{card.cta} <LuArrowRight/></button>
+              </div>
+              ))}
+          </div>
+        </section>
+      </div>
+      <section className={Styles.secondSection}>
+          <LatestBlogs/>
+          <div className={Styles.secondSectionDiv}>
+            <TrendingTags/>
+            <FeaturedSeries/>
+          </div>
       </section>
-    </div>
-    <section className={Styles.secondSection}>
-        <LatestBlogs/>
-        <div className={Styles.secondSectionDiv}>
-          <TrendingTags/>
-          <FeaturedSeries/>
-        </div>
-    </section>
     </>
   );
 }
+
+
+export default Home;

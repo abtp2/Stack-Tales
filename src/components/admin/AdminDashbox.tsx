@@ -302,7 +302,7 @@ const AdminDashbox: React.FC<AdminDashboxProps> = ({
 
       // Clear session
       localStorage.removeItem('admin_session');
-      
+      localStorage.clear();
       if (onLogout) {
         onLogout();
       }
@@ -310,6 +310,7 @@ const AdminDashbox: React.FC<AdminDashboxProps> = ({
       console.error('Error during logout:', err);
       // Still proceed with logout even if update fails
       localStorage.removeItem('admin_session');
+      localStorage.clear();
       if (onLogout) {
         onLogout();
       }

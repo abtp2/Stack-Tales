@@ -5,6 +5,7 @@ export interface Blog {
   title: string;
   content: string;
   series_id: string | null;
+  tags: string[];
 }
 
 export const loadBlogContentFromStorage = (): Blog | null => {

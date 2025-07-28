@@ -1,0 +1,202 @@
+'use client';
+import { useEffect, useState, useMemo, ReactNode } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
+import Styles from "../blog.module.css";
+import Code from "@/components/layout/Code";
+import { LuTwitter } from "react-icons/lu";
+import { FaLinkedin } from "react-icons/fa";
+import LoadingPlaceholder from "@/components/layout/LoadingPlaceholder";
+
+interface BlogClientProps {
+  slug: string;
+}
+
+const blogTagsList = [
+  "#JavaScript",
+  "#ReactJS",
+  "#NextJS",
+  "#TypeScript",
+  "#NodeJS",
+];
+
+const parseAndRenderContent = (content: string): ReactNode => {
+  if (!content) return null;
+
+  const codeRegex = /<Code\s+language=["']([^"']+)["'][^>]*>([\s\S]*?)<\/Code>/gi;
+  const parts: ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+  let key = 0;
+
+  while ((match = codeRegex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      const htmlContent = content.slice(lastIndex, match.index);
+      if (htmlContent.trim()) {
+        parts.push(
+          <div 
+            key={`html-${key++}`}
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
+          />
+        );
+      }
+    }
+
+    const language = match[1];
+    const codeContent = match[2];
+    parts.push(
+      <Code key={`code-${key++}`} language={language}>
+        {codeContent}
+      </Code>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < content.length) {
+    const remainingContent = content.slice(lastIndex);
+    if (remainingContent.trim()) {
+      parts.push(
+        <div 
+          key={`html-${key++}`}
+          dangerouslySetInnerHTML={{ __html: remainingContent }}
+        />
+      );
+    }
+  }
+
+  if (parts.length === 0) {
+    return <div dangerouslySetInnerHTML={{ __html: content }} />;
+  }
+
+  return <>{parts}</>;
+};
+
+export default function BlogClient({ slug }: BlogClientProps) {
+  const [loading, setLoading] = useState(true);
+  const [blog, setBlog] = useState<any>(null);
+  const [Author, setAuthor] = useState<any>(null);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log('Fetching blog with slug:', slug);
+      const supabase = createClient();
+      
+      // First, let's check what blogs exist
+      const { data: allBlogs, error: allBlogsError } = await supabase
+        .from('blogs')
+        .select('slug, title');
+      console.log('All available blogs:', allBlogs);
+      console.log('All blogs error:', allBlogsError);
+      
+      // Now fetch the specific blog
+      const { data: blogData, error: blogError } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+      console.log('Blog data:', blogData);
+      console.log('Blog error:', blogError);
+      
+      if (blogError) {
+        console.error('Blog fetch error:', blogError);
+        setError(`Blog error: ${blogError.message}`);
+        setLoading(false);
+        return;
+      }
+      
+      if (!blogData) {
+        console.log('No blog data found');
+        setError("No blog found with this slug");
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch Author data
+      const { data: AuthorData, error: AuthorError } = await supabase
+        .from('admins')
+        .select('username, avatar_url, github_url, linkedin_url')
+        .eq('id', blogData.author_id)
+        .single();
+      console.log('Author data:', AuthorData);
+      console.log('Author error:', AuthorError);
+      
+      if (AuthorError) {
+        console.error('Author fetch error:', JSON.stringify(AuthorError));
+        setError(`Author error: ${AuthorError.message}`);
+        setLoading(false);
+        return;
+      }
+      
+      if (!AuthorData) {
+        console.log('No Author data found');
+        setError("No Author found for this blog");
+        setLoading(false);
+        return;
+      }
+      
+      setBlog(blogData);
+      setAuthor(AuthorData);
+      setLoading(false);
+    };
+    
+    if (slug) {
+      fetchData();
+    } else {
+      setError("No slug provided");
+      setLoading(false);
+    }
+  }, [slug]);
+
+  const renderedContent = useMemo(() => {
+    return blog?.content ? parseAndRenderContent(blog.content) : null;
+  }, [blog?.content]);
+
+  if (loading) {
+    return (
+      <LoadingPlaceholder/>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <p>Error: {error}</p>
+        <p>Slug: {slug}</p>
+      </div>
+    );
+  }
+
+  return (
+    <section>
+      {blogTagsList.length > 0 && (
+        <div className={`${Styles.blogTags} overflow-none`}>
+          {blogTagsList.map((tag) => (
+            <p key={tag}>{tag}</p>
+          ))}
+        </div>
+      )}
+      <main className={Styles.blogContainer}>
+        <div className={Styles.blogTitle}>
+          <h2>{blog.title}</h2>
+          <span>
+            <img src={Author.avatar_url} alt={Author.username} />
+            <h1>{Author.username} <p>{new Date(blog.created_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}</p></h1>
+          </span>
+          <div>
+            <p><LuTwitter /> Share on Twitter</p>
+            <p><FaLinkedin /> Share on LinkedIn</p>
+          </div>
+        </div>
+        <div className={Styles.blogContent}>
+          {renderedContent}
+        </div>
+      </main>
+    </section>
+  );
+}
