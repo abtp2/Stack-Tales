@@ -5,6 +5,7 @@ import AdminDashbox from "@/components/admin/AdminDashbox";
 import AdminNavigation from "./AdminNavigation";
 import CreateBlog from "./CreateBlog";
 import AllBlogs from "./AllBlogs";
+import MediaUpload from './MediaUpload';
 import { useAI } from "@/hooks/useAI";
 import { loadBlogContentFromStorage, saveBlogContentToStorage, denounce } from "@/utils/blogStorage";
 import { Admin, TabType, PreviewTabType } from "@/types/admin";
@@ -165,6 +166,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
         );
       case "analytics":
         return <div>Analytics Content - Coming Soon</div>;
+      case "mediaUpload":
+        return <MediaUpload
+                  type="image"
+                  quality={90}
+                  format="webp"
+                  progressive={true}
+                  enableTransformations={true}
+                  lazyload={true}
+                  onUploadSuccess={(url, publicId) => {
+                    console.log('Optimized image uploaded:', url);
+                    navigator.clipboard.writeText(url);
+                    alert(url);
+                    // URL is automatically optimized with WebP format and 90% quality
+                  }}
+                  showPreview={true}
+                  previewWidth={300}
+                  previewHeight={200}
+                />;
       case "settings":
         return <div>Settings Content - Coming Soon</div>;
       default:

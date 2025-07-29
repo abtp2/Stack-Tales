@@ -1,0 +1,240 @@
+.upload-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+  color: rgba(var(--color));
+}
+
+.upload-dropzone {
+  border: 2px dashed rgba(var(--color),0.2);
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  background-color: rgba(var(--background),0.5);
+  transition: background-color 0.2s ease;
+}
+
+.upload-dropzone.drag-over {
+  background-color: rgba(var(--background));
+}
+
+.icon-placeholder{
+  margin-bottom: 1rem;
+}
+.icon-placeholder svg{
+  width: 80px;
+  height: 80px;
+  color: rgba(var(--color),0.2);
+}
+
+.upload-text{
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.upload-text .headline {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.upload-text .subline{
+  font-size: 13px;
+  color: rgba(var(--color),0.3);
+  line-height: 1.5;
+}
+.upload-text .filesize{
+  font-size: 14px;
+  color: rgba(var(--color),0.7);
+  line-height: 1.5;
+  margin-top: 10px;
+}
+.file-input {
+  display: none;
+}
+
+.upload-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(var(--theme),0.7);
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+.upload-btn:hover {
+  background-color: rgba(var(--theme),1);
+}
+
+.upload-progress {
+  margin-top: 2rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.progress-header h3{
+  display: inline;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.progress-header button{
+  padding: 10px;
+  background-color: rgba(var(--background));
+  color: rgba(var(--color),0.8);
+  border: 1px solid rgba(var(--color),0.15);
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.upload-item {
+  margin: 1rem 0;
+}
+
+.upload-meta {
+  display: flex;
+  justify-content: space-between;
+}
+.upload-meta-file-name{
+  font-size: 14px;
+  color: rgba(var(--color),0.7);
+}
+.status-badge, .upload-cancel {
+  padding: 5px 10px;
+  border-radius: 2px;
+  font-size: 12px;
+  color: rgba(var(--color));
+  border: 1px solid rgba(var(--color),0.1);
+}
+.upload-cancel{
+  color: rgba(var(--background));
+  background: rgba(var(--color));
+  margin-left: 10px;
+}
+.status-badge.uploading {
+  background-color: rgba(255,255,0,0.5);
+}
+.status-badge.completed {
+  background-color: rgba(0,255,0,0.5);
+}
+.status-badge.error {
+  background-color: rgba(255,0,0,0.5);
+}
+.status-badge.cancelled {
+  background-color: rgba(var(--color),0.5);
+}
+
+.progress-bar {
+  height: 8px;
+  background: rgba(var(--background),0.4);
+  border: 1px solid rgba(var(--color),0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.6rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: rgba(var(--theme));
+  transition: width 0.3s ease;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 0.85rem;
+}
+
+.media-gallery {
+  margin-top: 3rem;
+}
+.media-gallery h3{
+  display: inline;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.media-card {
+  border: 1px solid rgba(var(--color),0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: rgba(var(--background));
+  display: flex;
+  flex-direction: column;
+}
+
+.media-preview img,
+.media-preview video {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.media-info h4 {
+  margin: 1rem 0;
+  font-size: 14px;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: rgba(var(--color),0.6);
+}
+.url-copy{
+  margin-top: 1rem;
+}
+
+.copy-input {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.copy-input input {
+  flex: 1;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.copy-input button {
+  padding: 0.4rem 0.8rem;
+  background: rgba(var(--theme));
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.media-actions {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+}
+
+.media-actions button,
+.media-actions a {
+  color: rgba(var(--theme));
+  background: var(--fade);
+  padding: 8px 10px;
+  border: 1px solid rgba(var(--color),0.1);
+  border-radius: 5px;
+}
+.media-actions button{
+  color: rgba(var(--color));
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,0,0,0.25);
+  border: 1px solid rgba(255,0,0,0.6);
+}

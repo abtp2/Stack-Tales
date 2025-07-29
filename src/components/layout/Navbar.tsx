@@ -24,6 +24,11 @@ const Navbar = () => {
   const supabase = createClient();
   const router = useRouter();
 
+  useEffect(() => {
+    router.prefetch('/admin');
+    router.prefetch('/blog');
+  }, [router])
+
   // Default suggestions with their own slugs
   const defaultSuggestions: Blog[] = [
     { title: "Getting Started with React", slug: "getting-started-react" },

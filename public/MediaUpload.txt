@@ -1,0 +1,137 @@
+// MediaUpload.tsx
+import React, { useState, useRef } from "react";
+import "./MediaUpload.css";
+
+export default function MediaUpload() {
+  const [dragOver, setDragOver] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [mediaList, setMediaList] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    uploadFiles(files);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = () => setDragOver(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      uploadFiles(files);
+    }
+  };
+
+  const uploadFiles = async (files: File[]) => {
+    setUploading(true);
+    setProgress(0);
+
+    // Simulate upload with setTimeout
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      const fakeUpload = new Promise<string>((resolve) => {
+        const interval = setInterval(() => {
+          setProgress((prev) => {
+            const next = prev + 10;
+            if (next >= 100) {
+              clearInterval(interval);
+              resolve(URL.createObjectURL(file));
+            }
+            return next;
+          });
+        }, 100);
+      });
+
+      const url = await fakeUpload;
+      setMediaList((prev) => [...prev, url]);
+    }
+
+    setUploading(false);
+    setProgress(0);
+  };
+
+  return (
+    <div className="upload-container">
+      <div
+        className={`dropzone ${dragOver ? "drag-over" : ""}`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <p>Drag & Drop files here or click to select</p>
+        <input
+          type="file"
+          multiple
+          className="hidden"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+        />
+        <button className="upload-btn">Choose Files</button>
+      </div>
+
+      {uploading && (
+        <div className="upload-section">
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+          <span className="status-label status-uploading">Uploading</span>
+          <button className="cancel-btn" onClick={() => setUploading(false)}>
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {mediaList.length > 0 && (
+        <div className="gallery">
+          {mediaList.map((url, index) => (
+            <div className="media-card" key={index}>
+              <div className="media-preview">
+                <img src={url} alt={`Media ${index}`} />
+              </div>
+              <div className="media-info">Uploaded file #{index + 1}</div>
+              <div className="media-url">
+                <input type="text" value={url} readOnly />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(url);
+                  }}
+                >
+                  Copy
+                </button>
+              </div>
+              <div style={{ marginTop: "8px" }}>
+                <button
+                  className="link-btn"
+                  onClick={() => window.open(url, "_blank")}
+                >
+                  Open
+                </button>{" "}
+                |{" "}
+                <button
+                  className="remove-btn"
+                  onClick={() =>
+                    setMediaList((prev) =>
+                      prev.filter((_, i) => i !== index)
+                    )
+                  }
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

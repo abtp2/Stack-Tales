@@ -1,5 +1,5 @@
 "use client";
-import { LuPencilLine, LuFileText, LuChartLine, LuSettings } from "react-icons/lu";
+import { LuPencilLine, LuFileText, LuChartLine, LuImageUp, LuSettings } from "react-icons/lu";
 import { TabType } from "@/types/admin";
 import Styles from "@/app/admin/admin.module.css";
 
@@ -31,6 +31,13 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ activeTab, onTabChang
         type="button"
         aria-pressed={activeTab === "analytics"}>
         <LuChartLine /> Analytics
+      </button>
+      <button 
+        className={activeTab === "mediaUpload" ? Styles.activeTab : ""} 
+        onClick={() => onTabChange("mediaUpload")}
+        type="button"
+        aria-pressed={activeTab === "mediaUpload"}>
+        <LuImageUp /> Media Upload
       </button>
       <button 
         className={activeTab === "settings" ? Styles.activeTab : ""} 
