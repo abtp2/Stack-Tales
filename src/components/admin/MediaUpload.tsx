@@ -1,8 +1,15 @@
 "use client";
-import {ImageKitAbortError,ImageKitInvalidRequestError,ImageKitServerError,ImageKitUploadNetworkError,upload,} from "@imagekit/next";
+import {
+  ImageKitAbortError,
+  ImageKitInvalidRequestError,
+  ImageKitServerError,
+  ImageKitUploadNetworkError,
+  upload,
+} from "@imagekit/next";
 import "./MediaUpload.css";
-import { useRef, useState, useEffect } from "react";
-import {LuImageUp} from "react-icons/lu";
+import { useRef, useState } from "react";
+import { LuImageUp, LuTrash2 } from "react-icons/lu";
+import { type User } from '@supabase/supabase-js'
 
 interface UploadedMedia {
   id: string;
@@ -21,18 +28,18 @@ interface UploadProgress {
   error?: string;
 }
 
-const MediaUpload = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+interface MediaUploadProps {
+  admin: User;
+}
+
+const MediaUpload = ({ admin }: MediaUploadProps) => {
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
   const [uploadedMedia, setUploadedMedia] = useState<UploadedMedia[]>([]);
   const [dragOver, setDragOver] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortControllersRef = useRef<Map<string, AbortController>>(new Map());
-  const session = JSON.parse(localStorage.getItem("admin_session"));
-  
-  // Maximum file size (50MB)
+
   const MAX_FILE_SIZE = 50 * 1024 * 1024;
   const SUPPORTED_TYPES = {
     image: ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/svg+xml"],
@@ -40,87 +47,57 @@ const MediaUpload = () => {
   };
 
   const getAllSupportedTypes = () => [...SUPPORTED_TYPES.image, ...SUPPORTED_TYPES.video];
-  
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        setUser(session || null);
-      } catch (error) {
-        console.error("Auth check error:", error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, []);
-  
-  //Validates file type and size
+
   const validateFile = (file: File): { isValid: boolean; error?: string } => {
     const supportedTypes = getAllSupportedTypes();
     if (!supportedTypes.includes(file.type)) {
       return {
         isValid: false,
-        error: `Unsupported file type: ${file.type}. Supported: ${supportedTypes.join(", ")}`,
+        error: `Unsupported file type: ${file.type}.`,
       };
     }
     if (file.size > MAX_FILE_SIZE) {
       return {
         isValid: false,
-        error: `File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB. Max: ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+        error: `File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB.`,
       };
     }
     return { isValid: true };
   };
 
-  const getFileCategory = (fileType: string): "image" | "video" => {
-    return SUPPORTED_TYPES.image.includes(fileType) ? "image" : "video";
-  };
-  
-  //Formats file size for display
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
-  
-  //Authenticates and retrieves upload credentials
+
+  const getFileCategory = (fileType: string): "image" | "video" =>
+    SUPPORTED_TYPES.image.includes(fileType) ? "image" : "video";
+
   const authenticator = async () => {
-    try {
-      const response = await fetch("/api/imagekit/upload", {
-        headers: {
-          "Content-Type": "application/json",
-          "x-session-id": session?.id,
-        },
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Request failed: ${response.status} - ${errorText}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Authentication error:", error);
-      throw new Error("Authentication failed");
+    const response = await fetch("/api/imagekit/upload", {
+      headers: {
+        "Content-Type": "application/json",
+        "x-session-id": admin.id,
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Auth failed: ${response.status}`);
     }
+    return response.json();
   };
-  
-  //Handles single file upload
+
   const uploadSingleFile = async (file: File): Promise<void> => {
     const uploadId = `${file.name}-${Date.now()}`;
     const abortController = new AbortController();
     abortControllersRef.current.set(uploadId, abortController);
-    
-    // Add to uploads tracking
+
     setUploads((prev) => [...prev, { fileName: file.name, progress: 0, status: "uploading" }]);
 
     try {
-      // Get authentication parameters
       const { signature, expire, token, publicKey } = await authenticator();
-      // Upload file
+
       const uploadResponse = await upload({
         expire,
         token,
@@ -128,7 +105,7 @@ const MediaUpload = () => {
         publicKey,
         file,
         fileName: `${Date.now()}-${file.name}`,
-        folder: `/uploads/${user?.id || "anonymous"}`,
+        folder: `/uploads/${admin.id}`,
         useUniqueFileName: true,
         onProgress: (event) => {
           const progress = (event.loaded / event.total) * 100;
@@ -140,7 +117,7 @@ const MediaUpload = () => {
         },
         abortSignal: abortController.signal,
       });
-      // Create uploaded media object
+
       const uploadedFile: UploadedMedia = {
         id: uploadResponse.fileId,
         url: uploadResponse.url,
@@ -150,83 +127,60 @@ const MediaUpload = () => {
         uploadedAt: new Date(),
         thumbnailUrl: uploadResponse.thumbnailUrl,
       };
-      // Update states
+
       setUploadedMedia((prev) => [...prev, uploadedFile]);
       setUploads((prev) =>
         prev.map((upload) =>
-          upload.fileName === file.name ? { ...upload, progress: 100, status: "completed" } : upload
+          upload.fileName === file.name
+            ? { ...upload, progress: 100, status: "completed" }
+            : upload
         )
       );
     } catch (error) {
-      let errorMessage = "Upload failed";
-      if (error instanceof ImageKitAbortError) {
-        errorMessage = "Upload cancelled";
-        setUploads((prev) =>
-          prev.map((upload) =>
-            upload.fileName === file.name ? { ...upload, status: "cancelled" } : upload
-          )
-        );
-      } else if (
-        error instanceof ImageKitInvalidRequestError ||
-        error instanceof ImageKitUploadNetworkError ||
-        error instanceof ImageKitServerError ||
-        error instanceof Error
-      ) {
-        errorMessage = error.message;
-        setUploads((prev) =>
-          prev.map((upload) =>
-            upload.fileName === file.name ? { ...upload, status: "error", error: errorMessage } : upload
-          )
-        );
-      }
+      const errorMsg = error instanceof Error ? error.message : "Upload failed";
+      setUploads((prev) =>
+        prev.map((upload) =>
+          upload.fileName === file.name ? { ...upload, status: "error", error: errorMsg } : upload
+        )
+      );
     } finally {
       abortControllersRef.current.delete(uploadId);
     }
   };
-  //Handles multiple file uploads
+
   const handleFileUpload = async (files: FileList | File[]) => {
-    if (!user) return alert("Please log in to upload files");
     const fileArray = Array.from(files);
-    // Validate all files first
     for (const file of fileArray) {
       const { isValid, error } = validateFile(file);
       if (!isValid) return alert(`${file.name}: ${error}`);
     }
-    // Upload all files concurrently
-    await Promise.allSettled(fileArray.map((file) => uploadSingleFile(file)));
+    await Promise.allSettled(fileArray.map(uploadSingleFile));
   };
-  
-  //Handle file input change
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) handleFileUpload(e.target.files);
   };
-  
-  //Handle drag & drop
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
     if (e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files);
   };
-  
-  //Cancel Upload
+
   const cancelUpload = (fileName: string) => {
     for (const [key, controller] of abortControllersRef.current) {
       if (key.includes(fileName)) controller.abort();
     }
   };
-  
-  //Copy to clipboard
+
   const copyToClipboard = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
       alert("URL copied to clipboard!");
-    } catch (e) {
+    } catch {
       alert("Failed to copy URL");
     }
   };
-
-  if (loading) return <span>Loading...</span>;
-  if (!user) return <p>Please log in to upload media files.</p>;
 
   return (
     <div className="upload-container">
@@ -286,7 +240,7 @@ const MediaUpload = () => {
                   <span className="upload-meta-file-name">{upload.fileName}</span>
                   <div className="upload-status">
                     <span className={`status-badge ${upload.status}`}>{upload.status}</span>
-                    {upload.status === "uploading.." && (
+                    {upload.status === "uploading" && (
                       <button className="upload-cancel" onClick={() => cancelUpload(upload.fileName)}>Cancel</button>
                     )}
                   </div>

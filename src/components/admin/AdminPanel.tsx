@@ -1,140 +1,109 @@
 "use client";
 import { useState, useCallback, ChangeEvent, KeyboardEvent, useEffect } from "react";
 import Logo from "@/components/layout/Logo";
-import AdminDashbox from "@/components/admin/AdminDashbox";
+import AdminSettings from "@/components/admin/AdminSettings";
 import AdminNavigation from "./AdminNavigation";
 import CreateBlog from "./CreateBlog";
 import AllBlogs from "./AllBlogs";
 import MediaUpload from './MediaUpload';
 import { useAI } from "@/hooks/useAI";
-import { loadBlogContentFromStorage, saveBlogContentToStorage, denounce } from "@/utils/blogStorage";
-import { Admin, TabType, PreviewTabType } from "@/types/admin";
+import { loadBlogContentFromStorage, saveBlogContentToStorage } from "@/utils/blogStorage";
+import { TabType, PreviewTabType } from "@/types/admin";
+import { type User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client';
 import Styles from "@/app/admin/admin.module.css";
 
 interface AdminPanelProps {
-  admin: Admin;
-  onLogout: () => void;
+  admin: User;
+  setAdmin: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
+const AdminPanel: React.FC<AdminPanelProps> = ({ admin, setAdmin }) => {
   const [tab, setTab] = useState<TabType>("createBlog");
   const [previewTab, setPreviewTab] = useState<PreviewTabType>("preview");
   const [userDashbox, setUserDashbox] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>("");
   const [blogId, setBlogId] = useState<string | null>(null);
   const [blogTitle, setBlogTitle] = useState<string>("");
-  const [blogTags, setBlogTags] = useState<string[]>(["JavaScript", "ReactJS"]);
+  const [blogTags, setBlogTags] = useState<string[]>([]);
   const [blogSeries, setBlogSeries] = useState<string>("");
   const [blogContent, setBlogContent] = useState<string>("");
   const [adminAvatarUrl, setAdminAvatarUrl] = useState<string>("");
   const { aiLoading, components, generateText, addUserMessage } = useAI();
-  const supabase = createClient();
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_session');
-    onLogout();
-  };
 
-  // Load admin avatar URL from Supabase
+  // Load admin avatar
   useEffect(() => {
     const loadAdminAvatar = async () => {
-      try {
-        // Get admin ID from session storage
-        const session = localStorage.getItem('admin_session');
-        let adminId = admin?.id;
-        
-        if (!adminId && session) {
-          const sessionData = JSON.parse(session);
-          adminId = sessionData.id;
-        }
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('admins')
+        .select('avatar_url')
+        .eq('id', admin.id)
+        .single();
 
-        if (adminId) {
-          const { data, error } = await supabase
-            .from('admins')
-            .select('avatar_url')
-            .eq('id', adminId)
-            .single();
-
-          if (error) {
-            console.error('Error fetching admin avatar:', error);
-          } else {
-            setAdminAvatarUrl(data.avatar_url || '/avatar.jpg');
-          }
-        }
-      } catch (err) {
-        console.error('Error loading admin avatar:', err);
+      if (error || !data) {
+        console.error('Avatar error:', error);
         setAdminAvatarUrl('/avatar.jpg');
+      } else {
+        setAdminAvatarUrl(data.avatar_url || '/avatar.jpg');
       }
     };
-
     loadAdminAvatar();
-  }, [admin?.id, supabase]);
-  
-  function debounce(func: (...args: any[]) => void, delay: number) {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    return (...args: any[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  }
-  
-  // Load blog content from localStorage on component mount
+  }, [admin.id]);
+
+  // Load blog draft from storage
   useEffect(() => {
-    const savedContent = loadBlogContentFromStorage();
-    if (savedContent) {
-      setBlogId(savedContent.id)
-      setBlogTitle(savedContent.title);
-      setBlogSeries(savedContent.series_id);
-      setBlogTags(savedContent.tags);
-      setBlogContent(savedContent.content);
+    const saved = loadBlogContentFromStorage();
+    if (saved) {
+      setBlogId(saved.id);
+      setBlogTitle(saved.title);
+      setBlogSeries(saved.series_id);
+      setBlogTags(saved.tags);
+      setBlogContent(saved.content);
     }
   }, []);
 
-  // Save blog content to localStorage whenever it changesuseEffect(() => {
+  // Save blog draft with debounce
   useEffect(() => {
-  const debouncedSave = debounce(() => {
-      const blog = {
+    const handler = setTimeout(() => {
+      saveBlogContentToStorage({
         id: blogId,
         title: blogTitle,
         content: blogContent,
         series_id: blogSeries,
-        tags: blogTags
-      };
-      saveBlogContentToStorage(blog);
+        tags: blogTags,
+      });
     }, 500);
-    debouncedSave();
+    return () => clearTimeout(handler);
   }, [blogId, blogTitle, blogContent, blogSeries, JSON.stringify(blogTags)]);
-  
 
-  const handleSendMessage = useCallback((): void => {
-    const trimmedInput = inputText.trim();
-    if (trimmedInput && !aiLoading) {
-      addUserMessage(trimmedInput);
-      generateText(trimmedInput);
+  const handleSendMessage = useCallback(() => {
+    const trimmed = inputText.trim();
+    if (trimmed && !aiLoading) {
+      addUserMessage(trimmed);
+      generateText(trimmed);
       setInputText("");
     }
-  }, [inputText, aiLoading, addUserMessage, generateText]);
+  }, [inputText, aiLoading]);
 
-  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setInputText(e.target.value);
   }, []);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyPress = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   }, [handleSendMessage]);
 
-
   const renderTabContent = (): JSX.Element | null => {
     switch (tab) {
       case "createBlog":
         return (
           <CreateBlog
+            admin={admin}
             blogId={blogId}
             setBlogId={setBlogId}
             blogTitle={blogTitle}
@@ -157,7 +126,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
         );
       case "addBlog":
         return (
-          <AllBlogs 
+          <AllBlogs
+            admin={admin}
             blogId={blogId}
             setBlogId={setBlogId}
             tab={tab}
@@ -167,56 +137,52 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, onLogout }) => {
       case "analytics":
         return <div>Analytics Content - Coming Soon</div>;
       case "mediaUpload":
-        return <MediaUpload
-                  type="image"
-                  quality={90}
-                  format="webp"
-                  progressive={true}
-                  enableTransformations={true}
-                  lazyload={true}
-                  onUploadSuccess={(url, publicId) => {
-                    console.log('Optimized image uploaded:', url);
-                    navigator.clipboard.writeText(url);
-                    alert(url);
-                    // URL is automatically optimized with WebP format and 90% quality
-                  }}
-                  showPreview={true}
-                  previewWidth={300}
-                  previewHeight={200}
-                />;
+        return (
+          <MediaUpload
+            admin={admin}
+            type="image"
+            quality={90}
+            format="webp"
+            progressive={true}
+            enableTransformations={true}
+            lazyload={true}
+            onUploadSuccess={(url) => {
+              navigator.clipboard.writeText(url);
+              alert(`Image URL copied: ${url}`);
+            }}
+            showPreview={true}
+            previewWidth={300}
+            previewHeight={200}
+          />
+        );
       case "settings":
-        return <div>Settings Content - Coming Soon</div>;
+        return (
+          <AdminSettings
+            admin={admin}
+            setAdmin={setAdmin}
+            scale={userDashbox}
+            setUserDashbox={setUserDashbox}
+            userDashbox={userDashbox}
+            adminAvatarUrl={adminAvatarUrl}
+            setAdminAvatarUrl={setAdminAvatarUrl}
+          />
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className={userDashbox ? Styles.dashboxBlur : ""}>
-      <nav className={Styles.adminNav} role="banner">
+    <div>
+      <nav className={Styles.adminNav}>
         <Logo />
-        <AdminDashbox 
-          scale={userDashbox} 
-          adminId={admin.id} 
-          onLogout={handleLogout} 
-          setUserDashbox={setUserDashbox} 
-          userDashbox={userDashbox}
-          adminAvatarUrl ={adminAvatarUrl}
-          setAdminAvatarUrl ={setAdminAvatarUrl}
-        />
-        <div className={Styles.adminImg} onClick={() => setUserDashbox(true)}>
-          <p>Admin Account</p>
+        <div className={Styles.adminImg} onClick={() => setTab("settings")}>
           <img src={adminAvatarUrl || "/avatar.jpg"} alt="Admin Avatar" />
         </div>
       </nav>
-      <section role="main">
-        <AdminNavigation 
-          activeTab={tab}
-          onTabChange={setTab}
-        />
-        <div className={Styles.product}>
-          {renderTabContent()}
-        </div>
+      <section>
+        <AdminNavigation activeTab={tab} onTabChange={setTab} />
+        <div className={Styles.product}>{renderTabContent()}</div>
       </section>
     </div>
   );

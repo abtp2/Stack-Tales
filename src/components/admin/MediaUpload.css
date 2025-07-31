@@ -98,10 +98,16 @@
 .upload-meta {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
 }
 .upload-meta-file-name{
   font-size: 14px;
   color: rgba(var(--color),0.7);
+}
+.upload-status{
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 .status-badge, .upload-cancel {
   padding: 5px 10px;
@@ -113,7 +119,7 @@
 .upload-cancel{
   color: rgba(var(--background));
   background: rgba(var(--color));
-  margin-left: 10px;
+  margin-left: 5px;
 }
 .status-badge.uploading {
   background-color: rgba(255,255,0,0.5);

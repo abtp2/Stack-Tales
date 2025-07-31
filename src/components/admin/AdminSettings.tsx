@@ -15,7 +15,7 @@ interface Props {
   setAdminAvatarUrl: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const AdminDashbox: React.FC<Props> = ({
+const AdminSettings: React.FC<Props> = ({
   admin,
   setAdmin,
   scale = false,
@@ -29,11 +29,13 @@ const AdminDashbox: React.FC<Props> = ({
     username: '',
     github_url: '',
     linkedin_url: '',
+    readme: '',
     avatar_url: '',
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [loggingOut, setLoggingOut] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dashboxRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
@@ -44,7 +46,7 @@ const AdminDashbox: React.FC<Props> = ({
       try {
         const { data, error } = await supabase
           .from('admins')
-          .select('username, github_url, linkedin_url, avatar_url')
+          .select('username, github_url, linkedin_url, readme, avatar_url')
           .eq('id', admin.id)
           .single();
         if (error) throw error;
@@ -52,6 +54,7 @@ const AdminDashbox: React.FC<Props> = ({
           username: data.username || '',
           github_url: data.github_url || '',
           linkedin_url: data.linkedin_url || '',
+          readme: data.readme || '',
           avatar_url: data.avatar_url || '',
         });
         // In case this is the latest avatar and should be synced
@@ -144,6 +147,7 @@ const AdminDashbox: React.FC<Props> = ({
           username: formData.username,
           github_url: formData.github_url || null,
           linkedin_url: formData.linkedin_url || null,
+          readme: formData.readme || null,
           avatar_url: formData.avatar_url || null,
           updated_at: new Date().toISOString(),
         })
@@ -166,19 +170,23 @@ const AdminDashbox: React.FC<Props> = ({
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
-      setAdmin(null);
+      setLoggingOut(true);
+      const res = await fetch('/auth/signout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (res.ok || res.redirected || (res.status === 302)){ setAdmin(null) }
     } catch (err) {
       console.error('Logout error:', err);
+    } finally {
+      setLoggingOut(false);
     }
   };
 
   return (
-    <div
-      className={Styles.adminDashbox}
-      ref={dashboxRef}
-      style={{ transform: scale ? 'scale(1)' : 'scale(0)' }}
-    >
+    <div className={Styles.adminSettings}>
       <div className={Styles.dashboxData}>
         <span>
           <img
@@ -218,6 +226,10 @@ const AdminDashbox: React.FC<Props> = ({
           <legend>LinkedIn</legend>
           <input name="linkedin_url" value={formData.linkedin_url} onChange={handleInputChange} disabled={!isEditing} />
         </fieldset>
+        <fieldset>
+          <legend>README</legend>
+          <textarea name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing} placeholder="Use HTML for readme, just like GitHub"/>
+        </fieldset>
 
         <span>
           <button type="button" onClick={() => setIsEditing(!isEditing)} disabled={saving || uploading}>
@@ -229,7 +241,7 @@ const AdminDashbox: React.FC<Props> = ({
             </button>
           )}
           <button type="button" onClick={handleLogout} className={Styles.logoutButton} disabled={saving}>
-            <LuLogOut /> Log out
+            {loggingOut ? (<><LuLoaderCircle/> Logging out</>) : (<><LuLogOut/> Log out</>)}
           </button>
         </span>
       </div>
@@ -237,4 +249,4 @@ const AdminDashbox: React.FC<Props> = ({
   );
 };
 
-export default AdminDashbox;
+export default AdminSettings;

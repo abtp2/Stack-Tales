@@ -1,21 +1,13 @@
 "use client";
-import { ChangeEvent, useState, useRef, useEffect } from "react";
+import { ChangeEvent, useState, useRef, useEffect, FC } from "react";
 import { createClient } from '@/lib/supabase/client';
 import BlogToolbar from "./BlogToolbar";
 import TagInput from "./TagInput";
 import Styles from "@/app/admin/admin.module.css";
 import { LuSave, LuExternalLink, LuEraser } from "react-icons/lu";
+import { type User } from '@supabase/supabase-js'
+import { useRouter } from "next/navigation";
 
-interface AdminData {
-  id: string;
-  email: string;
-  name: string;
-  username?: string;
-  github_url?: string;
-  linkedin_url?: string;
-  avatar_url?: string;
-  role: string;
-}
 
 interface Series {
   id: string;
@@ -24,7 +16,8 @@ interface Series {
 }
 
 interface BlogEditorProps {
-  blogId?: string | null; // Optional for editing existing blogs
+  admin: User | null;
+  blogId?: string | null;
   setBlogId: React.Dispatch<React.SetStateAction<string | null>>;
   blogTitle: string;
   setBlogTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -34,10 +27,10 @@ interface BlogEditorProps {
   setBlogTags: React.Dispatch<React.SetStateAction<string[]>>;
   blogContent: string;
   setBlogContent: React.Dispatch<React.SetStateAction<string>>;
-  adminId?: string; // Admin ID to fetch admin data
 }
 
 const BlogEditor: FC<BlogEditorProps> = ({
+  admin,
   blogId,
   setBlogId,
   blogTitle,
@@ -46,269 +39,174 @@ const BlogEditor: FC<BlogEditorProps> = ({
   setBlogSeries,
   blogTags,
   setBlogTags,
-  blogContent, 
-  setBlogContent, 
-  adminId
+  blogContent,
+  setBlogContent,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const supabase = createClient();
-  
-  // State management
+
   const [series, setSeries] = useState<Series[]>([]);
-  const [adminDataID, setAdminDataID] = useState<AdminData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const [editingBlogData, setEditingBlogData] = useState<{ [key: string]: any }>({});
+  const router = useRouter();
 
-  // Fetch data on component mount
+  useEffect(() => {
+    router.prefetch('/blog');
+  }, [router])
+  
   useEffect(() => {
     fetchSeries();
-    if (!adminId && !adminDataID) {
-      fetchCurrentUserAdmin();
-    }
-    if (blogId) {
-      fetchBlogData();
-    }
-  }, [blogId, adminId, adminDataID]);
-
-  const checkUserExists = async (userId) => {
-    const { data, error } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('id', userId)
-      .single();
-    if (error) return false;
-    return !!data;
-  };
-  
-  const fetchCurrentUserAdmin = async () => {
-    try {
-      const session = localStorage.getItem('admin_session');
-      if (session) {
-        const sessionData = JSON.parse(session);
-        checkUserExists(sessionData.id).then(exists => {
-          if(exists) setAdminDataID(sessionData.id);
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching current admin:', error);
-      setMessage('Error loading user data');
-    }
-  };
+    if (blogId) fetchBlogData();
+  }, [blogId]);
 
   const fetchSeries = async () => {
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from('series')
-        .select('id, name, slug')
-        .order('name');
-
-      if (error) throw error;
-      setSeries(data || []);
-    } catch (error) {
-      console.error('Error fetching series:', error);
-      setMessage('Error loading series');
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    const { data, error } = await supabase.from('series').select('id, name, slug').order('name');
+    if (!error && data) setSeries(data);
+    setIsLoading(false);
   };
 
   const fetchBlogData = async () => {
     if (!blogId) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('blogs')
-        .select('title, content, series_id, tags')
-        .eq('id', blogId)
-        .single();
-
-      if (error) throw error;
-      
-      if (data) {
-        setBlogTitle(data.title);
-        setBlogContent(data.content);
-        setBlogSeries(data.series_id);
-        setBlogTags(data.tags);
-      }
-    } catch (error) {
-      console.error('Error fetching blog:', error);
-      setMessage('Error loading blog data');
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('title, slug, content, series_id, tags')
+      .eq('id', blogId)
+      .single();
+    if (!error && data) {
+      setBlogTitle(data.title);
+      setBlogContent(data.content);
+      setBlogSeries(data.series_id);
+      setBlogTags(data.tags);
+      setEditingBlogData(data);
     }
   };
 
-  function slugify(text: string): string {
-    return text
-      .toLowerCase()
+  const slugify = (text: string): string =>
+    text.toLowerCase()
       .trim()
       .replace(/[\s\-_]+/g, '-')
       .replace(/[^\w\-]+/g, '')
       .replace(/\-\-+/g, '-')
       .replace(/^-+|-+$/g, '');
-  }
 
   const handleSave = async () => {
-    if (!blogTitle.trim()) {
-      setMessage('Error : Please enter a blog title');
-      return;
-    }
-    if(adminId && (adminId != adminDataID)){
-      setMessage("Error : You cannot edit any other admin's blog");
-      return;
-    }
-    if (!blogContent.trim()) {
-      setMessage('Error : Please enter blog content');
-      return;
-    }
-    if (!adminDataID) {
-      setMessage('Error : Admin data not loaded. Please try again.');
-      return;
-    }
-    try {
+    if (!blogTitle.trim()) return setMessage('Error: Please enter a blog title');
+    if (!admin) return setMessage('Error: Admin not authenticated');
+    if (!blogContent.trim()) return setMessage('Error: Please enter blog content');
+
+    
       setIsSaving(true);
       setMessage('');
-
       const blogData = {
         title: blogTitle.trim(),
         content: blogContent,
         series_id: blogSeries || null,
         tags: blogTags,
-        author_id: adminDataID,
         slug: slugify(blogTitle.trim()),
         updated_at: new Date().toISOString(),
       };
-      let result;
-      
-      if (blogId) {
-        // Update existing blog (don't change author data on update)
-        const updateData = {
-          title: blogData.title,
-          content: blogData.content,
-          series_id: blogData.series_id,
-          tags: blogData.tags,
-          slug: slugify(blogData.title),
-          updated_at: blogData.updated_at,
-        };
-        
-        result = await supabase
-          .from('blogs')
-          .update(updateData)
-          .eq('id', blogId);
-      } else {
-        // Create new blog with full author data
-        result = await supabase
-          .from('blogs')
-          .insert([{
+      const result = blogId
+        ? await supabase.from('blogs').update(blogData).eq('id', blogId)
+        : await supabase.from('blogs').insert([{
             ...blogData,
+            author_id: admin.id,
             created_at: new Date().toISOString(),
           }]);
-      }
-
       if (result.error) throw result.error;
-
       setMessage(blogId ? 'Blog updated successfully!' : 'Blog saved successfully!');
       setTimeout(() => setMessage(''), 3000);
-      
-    } catch (error) {
-      console.error('Error saving blog:', JSON.stringify(error));
-      setMessage('Error saving blog. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
+    handleClear();
+    setIsSaving(false);
   };
 
-  const handleClear = () => {
-    if (window.confirm('Are you sure you want to clear all content?')) {
-      setBlogContent("");
+  const handleClear = (x) => {
+    if(x){
+      if (window.confirm('Clear all content?')) {
+      setBlogId(null)
       setBlogTitle("");
+      setBlogContent("");
       setBlogSeries("");
       setBlogTags([]);
       setMessage("");
     }
-  };
-  
-  const CancelEditBlog = ()=> {
-    try{
-      setBlogId("");
+    }else{
+      setBlogId(null)
       setBlogTitle("");
-      setBlogSeries("");
-      setBlogTags([])
       setBlogContent("");
-    } catch (error){
-      console.error("Error in cancelling blog editing");
+      setBlogSeries("");
+      setBlogTags([]);
     }
-  }
+  };
+
+  const cancelEdit = () => {
+    handleClear();
+  };
 
   return (
     <div className={Styles.createBlogDiv}>
-      {(blogId) && (
-      <span className={Styles.createBlogEditingBlog}>
-        <h1>Editing: <p>{blogTitle}</p> <LuExternalLink/> <button onClick={()=>{CancelEditBlog()}}>Cancel</button></h1>
-      </span>
+      {blogId && (
+        <span className={Styles.createBlogEditingBlog}>
+          <h1>
+            Editing: <p>{editingBlogData.title}</p> <LuExternalLink onClick={()=>{router.push(`/blog/${editingBlogData.slug}`);}}/>
+            <button onClick={cancelEdit}>Cancel</button>
+          </h1>
+        </span>
       )}
 
       <BlogToolbar textareaRef={textareaRef} />
+
       <div className={Styles.createBlogTitle}>
-        <input 
-          type="text" 
-          placeholder="Write Title for blog" 
-          value={blogTitle} 
-          onChange={(e) => {setBlogTitle(e.target.value)}}
+        <input
+          type="text"
+          placeholder="Write Title for blog"
+          value={blogTitle}
+          onChange={(e) => setBlogTitle(e.target.value)}
           disabled={isSaving}
           className={Styles.createBlogTitleInput}
         />
+
         <span className={Styles.createBlogSelectAndTags}>
-          <select 
-          value={blogSeries == null ? "" : blogSeries} 
-          onChange={(e) => setBlogSeries(e.target.value)} 
-          name="series"
-          disabled={isLoading || isSaving}
-        >
-          <option value="">Select series (optional)</option>
-          {series.map((seriesItem) => (
-            <option key={seriesItem.id} value={seriesItem.id}>
-              {seriesItem.name}
-            </option>
-          ))}
-        </select>
-        <TagInput
-        blogTags={blogTags}
-        setBlogTags={setBlogTags}
-        />
+          <select
+            value={blogSeries ?? ""}
+            onChange={(e) => setBlogSeries(e.target.value)}
+            disabled={isLoading || isSaving}
+          >
+            <option value="">Select series (optional)</option>
+            {series.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+
+          <TagInput blogTags={blogTags} setBlogTags={setBlogTags} />
         </span>
       </div>
-      
-      <textarea 
+
+      <textarea
         ref={textareaRef}
-        className={`${Styles.blogCode} overflow-none`} 
+        className={Styles.blogCode}
         placeholder="Start writing a blog..."
-        aria-label="Blog content editor"
         value={blogContent}
-        onChange={(e)=>{setBlogContent(e.target.value)}}
+        onChange={(e) => setBlogContent(e.target.value)}
         disabled={isSaving}
       />
-      
+
       {message && (
-        <div className={`${Styles.message} ${message.includes('Error') ? Styles.error : Styles.success}`}>
+        <div className={`${Styles.message} ${message.includes("Error") ? Styles.error : Styles.success}`}>
           {message}
         </div>
       )}
-      
+
       <span className={Styles.createBlogButtons}>
-        <button 
-          onClick={handleClear}
-          disabled={isSaving}
-          type="button"
-        >
-          <LuEraser/> Clear all
+        <button onClick={()=>{handleClear("confirm")}} disabled={isSaving} type="button">
+          <LuEraser /> Clear all
         </button>
-        <button 
-          onClick={()=>{handleSave()}}
-          disabled={isSaving || !adminDataID}
-          type="button"
-        >
-          <LuSave/> {isSaving ? 'Saving...' : 'Save'}
+        <button onClick={handleSave} disabled={isSaving || !admin} type="button">
+          <LuSave /> {isSaving ? "Saving..." : "Save"}
         </button>
       </span>
     </div>

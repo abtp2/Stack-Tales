@@ -1,14 +1,10 @@
 import { useState, useEffect, FC, ChangeEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Styles from "@/app/admin/admin.module.css";
-import {LuExternalLink, LuPencil, LuTrash} from "react-icons/lu";
+import { LuExternalLink, LuPencil, LuTrash } from "react-icons/lu";
 import { TabType } from "@/types/admin";
-
-interface Admin {
-  id: string;
-  username: string;
-  avatar_url: string;
-}
+import { type User } from '@supabase/supabase-js'
+import { useRouter } from "next/navigation";
 
 interface Blog {
   id: string;
@@ -18,7 +14,7 @@ interface Blog {
   author_id: string;
   created_at: string;
   admin?: Admin;
-  admins?: Admin | Admin[]; // For raw data from Supabase
+  admins?: Admin | Admin[];
 }
 
 interface AllBlogsProps {
@@ -26,13 +22,15 @@ interface AllBlogsProps {
   setBlogId: React.Dispatch<React.SetStateAction<string | null>>;
   tab: TabType;
   setTab: React.Dispatch<React.SetStateAction<TabType>>;
+  admin: User;
 }
 
 const AllBlogs: FC<AllBlogsProps> = ({
   blogId,
   setBlogId,
   tab,
-  setTab
+  setTab,
+  admin
 }) => {
   const supabase = createClient();
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -41,26 +39,18 @@ const AllBlogs: FC<AllBlogsProps> = ({
   const [rangeTo, setRangeTo] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  
-  // Search states
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<Blog[]>([]);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
-  const [currentAdminId, setCurrentAdminId] = useState<string>("");
-  const BLOGS_PER_PAGE = 6;
+  const router = useRouter();
+  useEffect(() => {
+    router.prefetch('/blog');
+  }, [router])
   
-  const fetchCurrentAdminId = () =>{
-    try{
-      const session = localStorage.getItem('admin_session');
-      if (session) {
-        const sessionData = JSON.parse(session);
-        setCurrentAdminId(sessionData.id);
-      }
-    } catch (error){
-      console.error("Error fetching current admin ID");
-    }
-  }
+  
+  const BLOGS_PER_PAGE = 6;
+
   const fetchBlogNumber = async () => {
     try {
       setLoading(true);
@@ -72,8 +62,6 @@ const AllBlogs: FC<AllBlogsProps> = ({
         setTotalBlogs(count);
         const initialRangeTo = Math.min(BLOGS_PER_PAGE - 1, count - 1);
         setRangeTo(initialRangeTo);
-        console.log("Total Blogs: " + count);
-        console.log("Initial range: 0 to " + initialRangeTo);
         await fetchInitialBlogData(0, initialRangeTo, count);
       }
     } catch (error) {
@@ -85,10 +73,9 @@ const AllBlogs: FC<AllBlogsProps> = ({
 
   const fetchInitialBlogData = async (from: number, to: number, totalCount: number) => {
     try {
-      console.log(`Fetching initial blogs from ${from} to ${to}`);
       const { data, error } = await supabase
         .from('blogs')
-        .select(`id, title, content, series_id, author_id, created_at,
+        .select(`id, title, slug, content, series_id, author_id, created_at,
           admins!blogs_author_id_fkey (
             id,
             username,
@@ -98,26 +85,23 @@ const AllBlogs: FC<AllBlogsProps> = ({
         .order('created_at', { ascending: false });
       if (error) throw error;
       if (data) {
-        console.log(`Fetched ${data.length} blogs`);
         const blogsWithAdmin = data.map(blog => ({
           ...blog,
           admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
         }));
         setBlogs(blogsWithAdmin);
         setHasMore((to + 1) < totalCount);
-        console.log(`Has more blogs: ${(to + 1) < totalCount}`);
       }
     } catch (error) {
-      console.error('Error fetching initial blogs:', error);
+      console.error('Error fetching blogs:', error);
     }
   };
 
   const fetchBlogData = async (from: number, to: number) => {
     try {
-      console.log(`Fetching blogs from ${from} to ${to}`);
       const { data, error } = await supabase
         .from('blogs')
-        .select(`id, title, content, series_id, author_id, created_at,
+        .select(`id, title, slug, content, series_id, author_id, created_at,
           admins!blogs_author_id_fkey (
             id,
             username,
@@ -127,24 +111,20 @@ const AllBlogs: FC<AllBlogsProps> = ({
         .order('created_at', { ascending: false });
       if (error) throw error;
       if (data) {
-        console.log(`Fetched ${data.length} more blogs`);
         const blogsWithAdmin = data.map(blog => ({
           ...blog,
           admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
         }));
-        setBlogs(prevBlogs => [...prevBlogs, ...blogsWithAdmin]);
+        setBlogs(prev => [...prev, ...blogsWithAdmin]);
         setHasMore(to < totalBlogs - 1);
-        console.log(`Has more blogs after loading: ${to < totalBlogs - 1}`);
       }
     } catch (error) {
       console.error('Error fetching blogs:', error);
     }
   };
 
-  // FIXED SEARCH FUNCTION
   const searchBlogs = async (term: string) => {
     if (!term.trim()) {
-      // If search term is empty, exit search mode and show original blogs
       setIsSearchMode(false);
       setSearchResults([]);
       return;
@@ -152,123 +132,48 @@ const AllBlogs: FC<AllBlogsProps> = ({
     try {
       setSearchLoading(true);
       setIsSearchMode(true);
-      
-      // Method 1: Search using two separate queries and combine results
+
       const searchTermFormatted = `%${term}%`;
-      
-      // Search by blog title
-      const titleSearchPromise = supabase
-        .from('blogs')
-        .select(`id, title, content, series_id, author_id, created_at,
-          admins!blogs_author_id_fkey (
-            id,
-            username,
-            avatar_url
-          )`)
-        .ilike('title', searchTermFormatted)
-        .order('created_at', { ascending: false });
 
-      // Search by admin username (using a different approach)
-      const authorSearchPromise = supabase
-        .from('blogs')
-        .select(`id, title, content, series_id, author_id, created_at,
-          admins!blogs_author_id_fkey (
-            id,
-            username,
-            avatar_url
-          )`)
-        .order('created_at', { ascending: false });
-
-      // Execute both queries
-      const [titleResults, authorResults] = await Promise.all([
-        titleSearchPromise,
-        authorSearchPromise
+      const [titleRes, authorRes] = await Promise.all([
+        supabase.from('blogs').select(`id, title, slug, content, series_id, author_id, created_at,
+          admins!blogs_author_id_fkey (id, username, avatar_url)`).ilike('title', searchTermFormatted),
+        supabase.from('blogs').select(`id, title, slug, content, series_id, author_id, created_at,
+          admins!blogs_author_id_fkey (id, username, avatar_url)`)
       ]);
 
-      if (titleResults.error) throw titleResults.error;
-      if (authorResults.error) throw authorResults.error;
+      if (titleRes.error) throw titleRes.error;
+      if (authorRes.error) throw authorRes.error;
 
-      // Process title search results
-      const titleBlogs = titleResults.data?.map(blog => ({
+      const titleBlogs = titleRes.data?.map(blog => ({
         ...blog,
         admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
       })) || [];
 
-      // Process author search results and filter by username
-      const authorBlogs = authorResults.data?.map(blog => ({
+      const authorBlogs = authorRes.data?.map(blog => ({
         ...blog,
         admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
-      })).filter(blog => 
+      })).filter(blog =>
         blog.admin?.username?.toLowerCase().includes(term.toLowerCase())
       ) || [];
 
-      // Combine results and remove duplicates
-      const combinedResults = [...titleBlogs];
-      
-      authorBlogs.forEach(authorBlog => {
-        if (!combinedResults.find(titleBlog => titleBlog.id === authorBlog.id)) {
-          combinedResults.push(authorBlog);
+      const combined = [...titleBlogs];
+      authorBlogs.forEach(b => {
+        if (!combined.find(existing => existing.id === b.id)) {
+          combined.push(b);
         }
       });
 
-      // Sort by created_at (newest first)
-      combinedResults.sort((a, b) => 
+      combined.sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
 
-      console.log(`Found ${combinedResults.length} search results`);
-      setSearchResults(combinedResults);
-      
+      setSearchResults(combined);
     } catch (error) {
-      console.error('Error searching blogs:', error);
-      // Fallback: search in client-side if database search fails
-      try {
-        console.log('Attempting client-side search fallback...');
-        await clientSideSearch(term);
-      } catch (fallbackError) {
-        console.error('Fallback search also failed:', fallbackError);
-        setSearchResults([]);
-      }
+      console.error('Search error:', error);
     } finally {
       setSearchLoading(false);
     }
-  };
-
-  // Fallback client-side search
-  const clientSideSearch = async (term: string) => {
-    // Get all blogs first
-    const { data, error } = await supabase
-      .from('blogs')
-      .select(`id, title, content, series_id, author_id, created_at,
-        admins!blogs_author_id_fkey (
-          id,
-          username,
-          avatar_url
-        )`)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    if (data) {
-      // Transform and filter on client side
-      const blogsWithAdmin = data.map(blog => ({
-        ...blog,
-        admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
-      }));
-
-      const filteredResults = blogsWithAdmin.filter(blog => {
-        const titleMatch = blog.title.toLowerCase().includes(term.toLowerCase());
-        const usernameMatch = blog.admin?.username?.toLowerCase().includes(term.toLowerCase()) || false;
-        return titleMatch || usernameMatch;
-      });
-
-      console.log(`Client-side search found ${filteredResults.length} results`);
-      setSearchResults(filteredResults);
-    }
-  };
-
-  const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
   };
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
@@ -276,181 +181,121 @@ const AllBlogs: FC<AllBlogsProps> = ({
     await searchBlogs(searchTerm);
   };
 
-  const handleClearSearch = () => {
-    setSearchTerm("");
-    setIsSearchMode(false);
-    setSearchResults([]);
+  const EditBlog = (id: string) => {
+    setTab("createBlog");
+    setBlogId(id);
   };
 
-  const loadMoreBlogs = async () => {
-    const nextRangeFrom = rangeTo + 1;
-    const nextRangeTo = Math.min(nextRangeFrom + BLOGS_PER_PAGE - 1, totalBlogs - 1);
-    
-    console.log(`Loading more blogs from ${nextRangeFrom} to ${nextRangeTo}`);
-    
-    setRangeFrom(nextRangeFrom);
-    setRangeTo(nextRangeTo);
-    
-    try {
-      setLoading(true);
-      await fetchBlogData(nextRangeFrom, nextRangeTo);
-    } catch (error) {
-      console.error('Error loading more blogs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const EditBlog = (x)=> {
-    try{
-      setTab("createBlog");
-      setBlogId(x);
-    } catch (error){
-      console.error("Error in editing blog");
-    }
-  };
-  
-  const DeleteBlog = async (x) => {
-    try {
-      const confirmDelete = window.confirm("Are you sure you want to delete this blog?");
-      if (!confirmDelete) {
-        alert("Blog deletion cancelled.");
-        return;
-      }
-      const promptInput = window.prompt('Type "StackTales" to delete this blog permanently.');
-      if (promptInput !== "StackTales") {
-        alert('Blog not deleted. You must type "StackTales" exactly.');
-        return;
-      }
-      const { error } = await supabase
-        .from('blogs')
-        .delete()
-        .eq('id', x);
-      if (error) throw error;
-      alert("Blog deleted successfully.");
-      if (isSearchMode) {
-        await searchBlogs(searchTerm);
-      } else {
-        setBlogs([]);
-        setRangeFrom(0);
-        setRangeTo(0);
-        await fetchBlogNumber();
-      }
-    } catch (error) {
-      console.error("Error in deleting blog:", error.message);
-      alert("An error occurred while deleting the blog.");
+  const DeleteBlog = async (id: string) => {
+    const confirmDelete = window.confirm("Are you sure?");
+    if (!confirmDelete) return;
+
+    const input = window.prompt('Type "StackTales" to confirm');
+    if (input !== "StackTales") return alert("Incorrect confirmation");
+
+    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    if (error) return alert("Error deleting blog");
+
+    if (isSearchMode) {
+      await searchBlogs(searchTerm);
+    } else {
+      setBlogs([]);
+      setRangeFrom(0);
+      setRangeTo(0);
+      await fetchBlogNumber();
     }
   };
 
-  // Load blogs on component mount
   useEffect(() => {
     fetchBlogNumber();
-    fetchCurrentAdminId();
   }, []);
 
-  // Determine which blogs to display
   const displayBlogs = isSearchMode ? searchResults : blogs;
-  const displayLoading = isSearchMode ? searchLoading : loading;
   const showViewMore = !isSearchMode && hasMore;
 
   return (
     <div className={`${Styles.AllBlogs} custom-scrollbar`}>
-      {loading && blogs.length === 0 ? (
-        <div className={Styles.AllBlogsLoading}>Loading blogs...</div>
-      ) : (
-        <>
-          <form onSubmit={handleSearchSubmit} className={Styles.AllBlogsSearch}>
-            <input 
-              type="text" 
-              placeholder="Search by title or author..."
-              value={searchTerm}
-              onChange={handleSearchInputChange}
-              className={Styles.AllBlogsSearchInput}
-            />
-            <button 
-              type="submit" 
-              disabled={searchLoading}
-              className={Styles.AllBlogsSearchButton}
-            >
-              {searchLoading ? 'Searching...' : 'Search'}
-            </button>
-            {isSearchMode && (
-              <button 
-                type="button" 
-                onClick={handleClearSearch}
-                className={Styles.AllBlogsSearchClear}
-              >
-                Clear
-              </button>
-            )}
-          </form>
-          <h2 className={Styles.AllBlogsSearchResult}>
-            {isSearchMode 
-              ? `Search Results (${searchResults.length} found)` 
-              : `Showing Blogs (${blogs.length} of ${totalBlogs})`
-            }
-          </h2>
-          {displayLoading && displayBlogs.length === 0 ? (
-            <div className={Styles.AllBlogsLoading}>
-              {isSearchMode ? '' : 'Loading blogs...'}
-            </div>
-          ) : (
-            <>
-              <div className={Styles.AllBlogsList}>
-                {displayBlogs.map((blog) => (
-                  <div key={blog.id} className={Styles.AllBlogsCard}>
-                    <div className={Styles.AllBlogsCardTools}>
-                      <LuExternalLink className={Styles.AllBlogsCardOpen}/>
-                      {(currentAdminId==blog.admin.id) && (
-                      <>
-                        <LuPencil onClick={()=>{EditBlog(blog.id)}}/>
-                        <LuTrash onClick={()=>{DeleteBlog(blog.id)}}/>
-                      </>
-                      )}
-                    </div>
-                    
-                    <span className={Styles.AllBlogsCardHeader}>
-                      {blog.admin?.avatar_url && (
-                        <img 
-                          src={blog.admin.avatar_url} 
-                          alt={blog.admin.username} 
-                          className={Styles.AllBlogsAuthorAvatar}
-                        />
-                      )}
-                      <h1>
-                        {blog.admin?.username || 'Unknown Author'}
-                        <p>
-                          {new Date(blog.created_at).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </p>
-                      </h1>
-                    </span>
-                    <p className={Styles.AllBlogsCardTitle}>{blog.title}</p>
-                  </div>
-                ))}
-              </div>
-              
-              {showViewMore && (
-                <button 
-                  className={Styles.AllBlogsViewMore} 
-                  onClick={loadMoreBlogs} 
-                  disabled={loading}
-                >
-                  {loading ? 'Loading...' : 'View More'}
-                </button>
+      <form onSubmit={handleSearchSubmit} className={Styles.AllBlogsSearch}>
+        <input
+          type="text"
+          placeholder="Search by title or author..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className={Styles.AllBlogsSearchInput}
+        />
+        <button type="submit" className={Styles.AllBlogsSearchButton}>
+          {searchLoading ? "Searching..." : "Search"}
+        </button>
+        {isSearchMode && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearchTerm("");
+              setIsSearchMode(false);
+              setSearchResults([]);
+            }}
+            className={Styles.AllBlogsSearchClear}
+          >
+            Clear
+          </button>
+        )}
+      </form>
+
+      <h2 className={Styles.AllBlogsSearchResult}>
+        {isSearchMode
+          ? `Search Results (${searchResults.length})`
+          : `Showing Blogs (${blogs.length} of ${totalBlogs})`}
+      </h2>
+
+      <div className={Styles.AllBlogsList}>
+        {displayBlogs.map((blog) => (
+          <div key={blog.id} className={Styles.AllBlogsCard}>
+            <div className={Styles.AllBlogsCardTools}>
+              <LuExternalLink onClick={()=>{router.push(`/blog/${blog.slug}`);}}/>
+              {admin?.id === blog.admin?.id && (
+                <>
+                  <LuPencil onClick={() => EditBlog(blog.id)} />
+                  <LuTrash onClick={() => DeleteBlog(blog.id)} />
+                </>
               )}
-            </>
-          )}
-        </>
-      )}
-      
-      {displayBlogs.length === 0 && !displayLoading && (
-        <p className={Styles.AllBlogsNoBlogs}>
-          {isSearchMode ? `No blogs found for "${searchTerm}"` : 'No blogs found'}
-        </p>
+            </div>
+            <span className={Styles.AllBlogsCardHeader}>
+              {blog.admin?.avatar_url && (
+                <img
+                  src={blog.admin.avatar_url}
+                  alt={blog.admin.username}
+                  className={Styles.AllBlogsAuthorAvatar}
+                />
+              )}
+              <h1>
+                {blog.admin?.username || "Unknown Author"}
+                <p>
+                  {new Date(blog.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </h1>
+            </span>
+            <p className={Styles.AllBlogsCardTitle}>{blog.title}</p>
+          </div>
+        ))}
+      </div>
+
+      {showViewMore && (
+        <button
+          className={Styles.AllBlogsViewMore}
+          onClick={async () => {
+            const nextFrom = rangeTo + 1;
+            const nextTo = Math.min(nextFrom + BLOGS_PER_PAGE - 1, totalBlogs - 1);
+            setRangeFrom(nextFrom);
+            setRangeTo(nextTo);
+            await fetchBlogData(nextFrom, nextTo);
+          }}
+        >
+          {loading ? "Loading..." : "View More"}
+        </button>
       )}
     </div>
   );

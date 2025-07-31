@@ -213,7 +213,7 @@ height: 45px;
 outline: none;
 border: 1px solid rgba(var(--color),0.1);
 background: rgb(var(--background));
-color: rgb(var(--color));
+color: rgb(var(--color),0.9);
 border-radius: 5px;
 padding: 0 1rem;
 resize: none;
@@ -233,7 +233,7 @@ height: 550px;
 outline: none;
 border: 1px solid rgba(var(--color),0.1);
 background: rgb(var(--background));
-color: rgb(var(--color));
+color: rgb(var(--color),0.9);
 border-radius: 5px;
 padding: 1rem;
 resize: none;
@@ -309,7 +309,7 @@ font-size: 14px;
 border: none;
 outline: none;
 background: transparent;
-color: rgba(var(--color));
+color: rgba(var(--color),0.9);
 }
 .tagInputSuggestions{
 width: 95%;
@@ -840,59 +840,51 @@ font-size: 14px;
 filter: blur(1px);
 pointer-events: none;
 }
-.adminDashbox{
-width: 80%;
-max-width: 400px;
-padding: 1rem;
-border-radius: 20px 0 20px 20px;
-background: var(--fade);
-position: absolute;
-z-index: 4;
-top: 70px;
-right: 40px;
-border: 1px solid rgba(var(--color),0.2);
-box-shadow: -1px 2px 2px rgba(var(--lcolor),0.05);
-transform: scale(0);
-transform-origin: right top;
-transition: transform 0.2s ease-in-out;
-}
-.adminDashbox .dashboxData{
+.adminSettings{
 width: 100%;
+padding: 1rem;
+margin: 0 auto;
+background: rgba(var(--background));
+border-radius: 5px;
+}
+.adminSettings .dashboxData{
+width: 96%;
+max-width: 400px;
 display: flex;
 align-items: center;
-gap: 1rem;
-margin-bottom: .8rem;
+gap: 0.5rem;
+margin: 0 auto 0.8rem auto;
 }
-.adminDashbox .dashboxData span{
+.adminSettings .dashboxData span{
 width: fit-content;
 display: flex;
 align-items: flex-end;
 position: relative;
 }
-.adminDashbox .dashboxData span:nth-of-type(2){
+.adminSettings .dashboxData span:nth-of-type(2){
 flex-direction: column;
 align-items: flex-start;
 padding-left: 10px;
 }
-.adminDashbox .dashboxData span h1{
+.adminSettings .dashboxData span h1{
 font-size: 16px;
 opacity: 0.9;
 word-break: break-all;
 }
-.adminDashbox .dashboxData span p{
+.adminSettings .dashboxData span p{
 font-size: 14px;
 opacity: 0.7;
 margin-top: 2px;
 word-break: break-all;
 }
-.adminDashbox .dashboxData span img{
+.adminSettings .dashboxData span img{
 width: 60px;
 height: 60px;
 border-radius: 100%;
 border: 1px solid rgba(var(--color),0.3);
 padding: 5px;
 }
-.adminDashbox .dashboxData span svg{
+.adminSettings .dashboxData span svg{
 width: 25px;
 height: 25px;
 padding: 5px;
@@ -904,58 +896,63 @@ position: absolute;
 bottom: 0;
 right: -10px;
 }
-.adminDashbox .dashboxForm{
+.adminSettings .dashboxForm{
 width: 96%;
+max-width: 400px;
 margin: 0 auto;
 display: flex;
 flex-direction: column;
 }
-.adminDashbox .dashboxForm fieldset{
+.adminSettings .dashboxForm fieldset{
 width: 100%;
 margin: 12px auto 0 auto;
 border: 1.5px solid rgba(var(--color),0.1);
 border-radius: 5px;
 padding: 0 10px;
 }
-.adminDashbox .dashboxForm fieldset legend{
+.adminSettings .dashboxForm fieldset legend{
 margin-left: 2px;
 padding: 0 2px;
-color: rgba(var(--color),0.6);
+color: rgba(var(--color),1);
 font-size: 14px;
 }
-.adminDashbox .dashboxForm fieldset input{
+.adminSettings .dashboxForm fieldset input, .adminSettings .dashboxForm fieldset textarea{
 width: 100%;
 height: 100%;
-color: rgba(var(--color));
+color: rgba(var(--color),0.6);
 outline: none;
-padding: 9px 0;
+padding: 12px 0 12px 5px;
 border: none;
 background: transparent;
 opacity: 0.85;
 font-size: 14px;
-user-select: none !important;
+font-family: "Inter", sans-serif;
+resize: vertical;
 }
-.adminDashbox .dashboxForm span{
+.adminSettings .dashboxForm fieldset textarea{
+min-height: 150px;
+}
+.adminSettings .dashboxForm span{
 margin-top: 1rem;
 display: flex;
 flex-wrap: wrap;
 align-items: center;
 gap: 8px;
 }
-.adminDashbox .dashboxForm span button{
-min-width: 80px;
-padding: 9px 10px;
+.adminSettings .dashboxForm span button{
+min-width: 70px;
+padding: 8px;
 display: flex;
 align-items: center;
 justify-content: center;
 gap: 8px;
-outline: 1.5px solid rgba(var(--dcolor),0.15);
-border: 1.5px solid rgba(var(--lcolor),0.1);
+border: 1.5px solid rgba(var(--dcolor),0.15);
+outline: 1.5px solid rgba(var(--lcolor),0.1);
 border-radius: 6px;
-background: rgba(var(--background));
+background: var(--fade);
 color: rgba(var(--color),0.7);
 }
-.adminDashbox .logoutButton{
+.adminSettings .logoutButton{
 background: rgba(255,0,0,0.1) !important;
 border-color: rgba(255,0,0,0.15) !important;
 outline: none !important;

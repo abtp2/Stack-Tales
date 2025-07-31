@@ -4,10 +4,13 @@ import BlogEditor from "./BlogEditor";
 import PreviewTabs from "./PreviewTabs";
 import PreviewBox from "./PreviewBox";
 import AIBox from "./AIBox";
-import { ChatMessage, PreviewTabType } from "@/types/admin";
+import { TabType, ChatMessage, PreviewTabType } from "@/types/admin";
 import Styles from "@/app/admin/admin.module.css";
+import { type User } from '@supabase/supabase-js'
+
 
 interface CreateBlogProps {
+  admin: User;
   blogId?: string | null; // Optional for editing existing blogs
   setBlogId: React.Dispatch<React.SetStateAction<string | null>>;
   blogTitle: string;
@@ -29,6 +32,7 @@ interface CreateBlogProps {
 }
 
 const CreateBlog: FC<CreateBlogProps> = ({
+  admin,
   blogId,
   setBlogId,
   blogTitle,
@@ -51,6 +55,7 @@ const CreateBlog: FC<CreateBlogProps> = ({
   return (
     <div className={Styles.createBlog}>
       <BlogEditor 
+        admin={admin}
         blogId={blogId}
         setBlogId={setBlogId}
         blogTitle={blogTitle}
@@ -63,12 +68,13 @@ const CreateBlog: FC<CreateBlogProps> = ({
         setBlogContent={setBlogContent}
       />
       <div className={Styles.createBlogDiv}>
-        <PreviewTabs 
+        <PreviewTabs
           activeTab={previewTab}
           onTabChange={onPreviewTabChange}
         />
         <PreviewBox 
           style={{ display: previewTab === "preview" ? 'flex' : 'none' }}
+          admin={admin}
           content={blogContent}
           blogTitle={blogTitle}
           setBlogTitle={setBlogTitle}
