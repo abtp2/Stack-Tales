@@ -2,16 +2,17 @@
 import Logo from "@/components/layout/Logo";
 import Styles from "@/components/layout/layout.module.css";
 import { createClient } from "@/lib/supabase/client";
-import { LuMenu, LuSearch, LuX } from "react-icons/lu";
+import { LuMenu, LuSearch, LuX, LuSun, LuMoon } from "react-icons/lu";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-
+import {useTheme} from "@/app/theme-provider";
 interface Blog {
   title: string;
   slug: string;
 }
 
 const Navbar = () => {
+  const { theme, setTheme } = useTheme();
   const [sidebar, setSidebar] = useState<boolean>(false);
   const [searchBox, setSearchBox] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -130,10 +131,7 @@ const Navbar = () => {
     <div className={Styles.nav}>
       <Logo />
       <span>
-        <div
-          className={Styles.sidebar}
-          style={sidebar ? { left: "0" } : { left: "-100%" }}
-        >
+        <div className={Styles.sidebar} style={sidebar ? { left: "0" } : { left: "-100%" }}>
           <LuX onClick={() => setSidebar(false)} />
           <p onClick={()=>{router.push("")}}>Courses</p>
           <p onClick={()=>{router.push("")}}>Categories</p>
@@ -141,6 +139,7 @@ const Navbar = () => {
           <p onClick={()=>{router.push("")}}>About</p>
           <p onClick={()=>{router.push("/admin")}}>Admin</p>
         </div>
+        <div className={Styles.themeIcon} onClick={()=>{setTheme(theme === 'light' ? 'dark' : 'light')}}>{theme=="light" ? (<LuMoon/>) : (<LuSun/>)}</div>
         <LuSearch
           className={Styles.searchIcon}
           onClick={() => setSearchBox((prev) => !prev)}
@@ -158,21 +157,18 @@ const Navbar = () => {
             </div>
             <div className={`${Styles.searchBoxResult} custom-scrollbar`}>
               {loading ? (
-                <p style={{ opacity: 0.6, fontStyle: "italic" }}>Loading...</p>
+                <span><p style={{ opacity: 0.6, fontStyle: "italic" }}>Loading...</p></span>
               ) : filteredBlogs.length > 0 ? (
                 filteredBlogs.map((blog, index) => (
-                  <p
-                    key={`${blog.slug}-${index}`}
-                    onClick={() => handleBlogSelect(blog.slug)}
-                    style={{ cursor: "pointer" }}
-                  >
+                <span key={`${blog.slug}-${index}`}>
+                  <p onClick={() => handleBlogSelect(blog.slug)} style={{ cursor: "pointer" }}>
                     {blog.title}
-                  </p>
+                  </p></span>
                 ))
               ) : (
-                <p style={{ opacity: 0.6, fontStyle: "italic" }}>
+                <span><p style={{ opacity: 0.6, fontStyle: "italic" }}>
                   No blogs found
-                </p>
+                </p></span>
               )}
             </div>
           </div>

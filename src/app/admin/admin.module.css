@@ -845,6 +845,7 @@ width: 100%;
 padding: 1rem;
 margin: 0 auto;
 background: rgba(var(--background));
+border: 1px solid rgba(var(--color),0.1);
 border-radius: 5px;
 }
 .adminSettings .dashboxData{

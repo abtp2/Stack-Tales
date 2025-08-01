@@ -13,18 +13,20 @@
   --llines: rgba(var(--theme),0.5);
   --theme: 42,138,240;
 }
-.light{
+body.light{
   --background: var(--lbg);
   --color: var(--lcolor);
   --fade: var(--lfade);
   --lines: var(--llines);
 }
-.dark{
+body.dark{
   --background: var(--dbg);
   --color: var(--dcolor);
   --fade: var(--dfade);
   --lines: var(--dlines);
 }
+
+/*
 @media(prefers-color-scheme: dark){
   html{
   --background: var(--dbg);
@@ -41,6 +43,7 @@
   --lines: var(--llines);
   }
 }
+*/
 
 
 html,
