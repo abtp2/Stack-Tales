@@ -86,7 +86,7 @@ export type Database = {
       }
       blogs: {
         Row: {
-          author_id: string | null
+          author_id: string
           content: string
           created_at: string
           id: string
