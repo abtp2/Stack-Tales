@@ -216,31 +216,31 @@ const AdminSettings: React.FC<Props> = ({
       <div className={Styles.dashboxForm}>
         <fieldset>
           <legend>Username</legend>
-          <input name="username" value={formData.username} onChange={handleInputChange} disabled={!isEditing} />
+          <input name="username" value={formData.username} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} />
         </fieldset>
         <fieldset>
           <legend>GitHub</legend>
-          <input name="github_url" value={formData.github_url} onChange={handleInputChange} disabled={!isEditing} />
+          <input name="github_url" value={formData.github_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
         </fieldset>
         <fieldset>
           <legend>LinkedIn</legend>
-          <input name="linkedin_url" value={formData.linkedin_url} onChange={handleInputChange} disabled={!isEditing} />
+          <input name="linkedin_url" value={formData.linkedin_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
         </fieldset>
         <fieldset>
           <legend>README</legend>
-          <textarea name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing} placeholder="Use HTML for readme, just like GitHub"/>
+          <textarea name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} placeholder="Use HTML for readme, just like GitHub"/>
         </fieldset>
 
         <span>
-          <button type="button" onClick={() => setIsEditing(!isEditing)} disabled={saving || uploading}>
+          <button type="button" onClick={() => setIsEditing(!isEditing)} disabled={saving || uploading || loggingOut}>
             <LuPenLine /> {isEditing ? 'Cancel' : 'Edit'}
           </button>
           {isEditing && (
-            <button type="button" onClick={handleSave} disabled={saving || uploading}>
+            <button type="button" onClick={handleSave} disabled={saving || uploading || loggingOut}>
               {saving ? <LuLoaderCircle className="LoaderSpin" /> : <LuSave />} {saving ? 'Saving...' : 'Save'}
             </button>
           )}
-          <button type="button" onClick={handleLogout} className={Styles.logoutButton} disabled={saving}>
+          <button type="button" onClick={handleLogout} className={Styles.logoutButton} disabled={saving || loggingOut}>
             {loggingOut ? (<><LuLoaderCircle/> Logging out</>) : (<><LuLogOut/> Log out</>)}
           </button>
         </span>

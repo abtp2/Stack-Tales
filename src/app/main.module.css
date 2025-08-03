@@ -64,7 +64,7 @@ height: 35px;
 border: 1.8px solid rgba(var(--dcolor), 0.9);
 border-radius: 100%;
 position: relative;
-margin: 0 -8px;
+margin: 0 -10px;
 filter: grayscale(0) brightness(0.9);
 }
 .heroAvatars a{

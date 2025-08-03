@@ -21,6 +21,7 @@ export default function AdminPanelWrapper({ admin }: { admin: User }) {
       listener.subscription.unsubscribe()
     }
   }, [])
+  
 
   if (!currentAdmin) return <AdminAuth setAdmin={setCurrentAdmin}/>
   return <AdminPanel admin={currentAdmin} setAdmin={setCurrentAdmin} />

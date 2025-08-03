@@ -166,9 +166,11 @@ const AdminDashbox: React.FC<Props> = ({
 
   const handleLogout = async () => {
     try {
+      setSaving(true)
       await supabase.auth.signOut();
       setAdmin(null);
     } catch (err) {
+      setSaving(false)
       console.error('Logout error:', err);
     }
   };
