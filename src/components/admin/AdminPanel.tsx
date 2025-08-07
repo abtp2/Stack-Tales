@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, ChangeEvent, KeyboardEvent, useEffect } from "react";
 import Logo from "@/components/layout/Logo";
+import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminNavigation from "./AdminNavigation";
 import CreateBlog from "./CreateBlog";
@@ -135,7 +136,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, setAdmin }) => {
           />
         );
       case "analytics":
-        return <div>Analytics Content - Coming Soon</div>;
+        return (
+          <AdminAnalytics
+          admin={admin}
+          />
+        );
       case "mediaUpload":
         return (
           <MediaUpload

@@ -59,13 +59,13 @@ align-items: center;
 justify-content: center;
 }
 .heroAvatars span img{
-width: 35px;
-height: 35px;
-border: 1.8px solid rgba(var(--dcolor), 0.9);
+width: 32px;
+height: 32px;
+border: 1.5px solid rgba(var(--dcolor), 0.6);
 border-radius: 100%;
 position: relative;
-margin: 0 -10px;
-filter: grayscale(0) brightness(0.9);
+margin: 0 -8px;
+filter: grayscale(0.1) brightness(0.9);
 }
 .heroAvatars a{
 color: rgb(var(--color));

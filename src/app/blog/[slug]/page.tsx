@@ -2,16 +2,18 @@ import Navbar from "@/components/layout/Navbar";
 import BlogClient from "./BlogClient";
 
 interface BlogProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function BlogPage({ params }: BlogProps) {
+  const { slug } = await params;
+  
   return (
     <>
       <Navbar />
-      <BlogClient slug={params.slug} />
+      <BlogClient slug={slug} />
     </>
   );
 }

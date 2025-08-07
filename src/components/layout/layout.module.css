@@ -31,7 +31,7 @@ display: flex;
 align-items: center;
 justify-content: space-between;
 padding: 0 1.2rem;
-border-bottom: 1px solid rgba(var(--color),0.2);
+border-bottom: 1px solid rgba(var(--color),0.05);
 }
 .nav span{
 display: flex;

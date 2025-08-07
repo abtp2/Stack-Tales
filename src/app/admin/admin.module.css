@@ -833,9 +833,19 @@ color: rgba(255,0,0,0.8);
 font-size: 14px;
 }
 
+/* Admin Analytics */
+.adminAnalytics{
+width: 100%;
+padding: 1rem;
+margin: 0 auto;
+background: rgba(var(--background));
+border: 1px solid rgba(var(--color),0.1);
+border-radius: 5px;
+}
 
 
-/* Admin Dashbox */
+
+/* Admin Settings */
 .dashboxBlur > *:not(nav){
 filter: blur(1px);
 pointer-events: none;

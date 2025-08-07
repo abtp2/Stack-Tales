@@ -6,7 +6,7 @@ align-items: center;
 gap: 1rem;
 padding: 1rem;
 background: var(--fade);
-box-shadow: 0 3px 5px -2px rgba(var(--lcolor),0.05);
+/* box-shadow: 0 3px 5px -2px rgba(var(--lcolor),0.05); */
 border: 1px solid rgba(var(--color),0.1);
 }
 .blogTags p{
@@ -22,6 +22,32 @@ font-size: 14px;
     margin-top: 1rem;
     padding: 1rem 2rem;
   }
+}
+.blogSeriesBox{
+width: 100%;
+display: flex;
+align-items: center;
+color: rgba(var(--color),0.6);
+/* border-top: 1px solid rgba(var(--color),0.1); */
+border-bottom: 1px solid rgba(var(--color),0.1);
+padding: 14px 1rem;
+margin: 0rem 0 0 0;
+font-size: 14px;
+overflow: auto;
+}
+.blogSeriesBox p{
+display: flex;
+align-items: center;
+gap: 5px;
+white-space: nowrap;
+}
+.blogSeriesBox svg:nth-of-type(1){
+width: 18px;
+height: 18px;
+color: rgba(var(--color),0.8);
+}
+.blogSeriesBox svg:nth-of-type(2){
+color: rgba(var(--color),0.8);
 }
 .blogContainer{
 width: 90%;
@@ -85,7 +111,7 @@ border: 1px solid rgba(var(--lcolor),0.1);
 border-radius: 5px;
 padding: 9px 10px;
 user-select: none;
-box-shadow: 0 3px 5px -2px rgba(var(--lcolor),0.05);
+/* box-shadow: 0 3px 5px -2px rgba(var(--lcolor),0.05); */
 }
 .blogTitle div p svg{
 width: 16px;
@@ -207,6 +233,104 @@ pointer-events: auto;
 
 .blogContent a:hover {
   color: #0051a3;
+}
+
+
+/* Like Box */
+.likeBox{
+width: 300px;
+border-radius: 1rem;
+border: 1px solid rgba(var(--color),0.2);
+display: flex;
+flex-direction: column;
+align-items: center;
+margin: 1rem auto 20rem auto;
+overflow: hidden;
+}
+.likeBox span{
+width: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 8px 1rem;
+background: var(--fade);
+}
+.likeBox p{
+font-size: 14px;
+color: rgba(var(--color),1);
+margin-right: 10px;
+font-weight: 600;
+}
+.likeBoxIcon{
+width: 35px;
+height: 35px;
+border-radius: 100%;
+padding: 7px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.likeBoxIcon svg{
+width: 100%;
+height: 100%;
+color: rgba(var(--color),0.9);
+}
+.likeBoxIcon:hover{
+background: var(--fade);
+}
+
+.likeBoxIcon:hover .likeBox textarea{
+display: flex;
+}
+
+.likeBox textarea{
+width: 100%;
+min-height: 120px;
+background: transparent;
+border: none;
+border-top: 1px solid rgba(var(--color),0.2);
+border-bottom: 1px solid rgba(var(--color),0.2);
+resize: vertical;
+font-family: "Inter", sans-serif;
+font-size: 14px;
+color: rgba(var(--color),0.8);
+padding: 1rem;
+outline: none;
+transform: scale(0);
+position: absolute;
+z-index: -10;
+}
+.LikeBoxButton{
+width: 100%;
+display: flex;
+align-items: center;
+justify-content: flex-end;
+padding: 10px 1rem;
+transform: scale(0);
+position: absolute;
+z-index: -10;
+}
+.LikeBoxButton button{
+padding: 8px 10px;
+background: rgba(var(--color),0.9);
+color: rgba(var(--background));
+border-radius: 5px;
+border: none;
+outline: none;
+display: flex;
+align-items: center;
+gap: 5px;
+pointer-events: auto;
+opacity: 1;
+}
+.showLikeBoxTextarea{
+transform: scale(1) !important;
+position: static !important;
+z-index: auto !important;
+}
+.LikeBoxButtonInactive{
+pointer-events: none !important;
+opacity: 0.6 !important;
 }
 
 
