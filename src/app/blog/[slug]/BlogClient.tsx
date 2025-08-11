@@ -109,10 +109,16 @@ export default function BlogClient({ slug }: BlogClientProps) {
       }
       
       // Fetch Author data
+      const authorId = blogData.author_id;
+      if (!authorId) {
+        setError('No Author associated with this blog');
+        setLoading(false);
+        return;
+      }
       const { data: AuthorData, error: AuthorError } = await supabase
         .from('admins')
         .select('username, avatar_url, github_url, linkedin_url')
-        .eq('id', blogData.author_id)
+        .eq('id', authorId)
         .single();
       if (AuthorError) {
         console.error('Author fetch error:', JSON.stringify(AuthorError));
