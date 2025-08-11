@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, ChangeEvent, KeyboardEvent, useEffect } from "react";
+import React, { useState, useCallback, ChangeEvent, KeyboardEvent, useEffect } from "react";
 import Logo from "@/components/layout/Logo";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import AdminSettings from "@/components/admin/AdminSettings";
@@ -27,7 +27,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, setAdmin }) => {
   const [blogId, setBlogId] = useState<string | null>(null);
   const [blogTitle, setBlogTitle] = useState<string>("");
   const [blogTags, setBlogTags] = useState<string[]>([]);
-  const [blogSeries, setBlogSeries] = useState<string>("");
+  const [blogSeries, setBlogSeries] = useState<string | null>("");
   const [blogContent, setBlogContent] = useState<string>("");
   const [adminAvatarUrl, setAdminAvatarUrl] = useState<string>("");
   const { aiLoading, components, generateText, addUserMessage } = useAI();
@@ -69,7 +69,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, setAdmin }) => {
   useEffect(() => {
     const handler = setTimeout(() => {
       saveBlogContentToStorage({
-        id: blogId,
+        id: blogId || "",
         title: blogTitle,
         content: blogContent,
         series_id: blogSeries,
@@ -99,7 +99,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, setAdmin }) => {
     }
   }, [handleSendMessage]);
 
-  const renderTabContent = (): JSX.Element | null => {
+  const renderTabContent = (): React.ReactElement | null => {
     switch (tab) {
       case "createBlog":
         return (
@@ -145,19 +145,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ admin, setAdmin }) => {
         return (
           <MediaUpload
             admin={admin}
-            type="image"
-            quality={90}
-            format="webp"
-            progressive={true}
-            enableTransformations={true}
-            lazyload={true}
-            onUploadSuccess={(url) => {
-              navigator.clipboard.writeText(url);
-              alert(`Image URL copied: ${url}`);
-            }}
-            showPreview={true}
-            previewWidth={300}
-            previewHeight={200}
           />
         );
       case "settings":

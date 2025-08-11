@@ -74,7 +74,10 @@ const TagInput: FC<TagInputProps> =({
         return;
       }
       console.log('Fetched tags:', data);
-      setDefaultTags(data || []);
+      const normalized: TagRow[] = (data || [])
+        .filter((row): row is { name: string } => typeof row?.name === 'string' && row.name.trim().length > 0)
+        .map((row) => ({ name: row.name }));
+      setDefaultTags(normalized);
     } catch (err) {
       console.error('Unexpected error:', err);
     } finally {

@@ -1,5 +1,5 @@
 export const insertHtmlList = (
-  textareaRef: React.RefObject<HTMLTextAreaElement>,
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>,
   listType: "ul" | "ol"
 ): void => {
   const textarea = textareaRef.current;
@@ -24,7 +24,7 @@ export const insertHtmlList = (
 };
 
 export const insertText = (
-  textareaRef: React.RefObject<HTMLTextAreaElement>,
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>,
   before: string,
   after: string
 ): void => {

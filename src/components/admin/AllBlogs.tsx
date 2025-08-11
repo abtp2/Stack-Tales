@@ -6,15 +6,22 @@ import { TabType } from "@/types/admin";
 import { type User } from '@supabase/supabase-js'
 import { useRouter } from "next/navigation";
 
+interface AdminRef {
+  id: string;
+  username: string | null;
+  avatar_url: string | null;
+}
+
 interface Blog {
   id: string;
   title: string;
+  slug: string | null;
   content: string;
-  series_id: string;
-  author_id: string;
+  series_id: string | null;
+  author_id: string | null;
   created_at: string;
-  admin?: Admin;
-  admins?: Admin | Admin[];
+  admin?: AdminRef;
+  admins?: AdminRef | AdminRef[];
 }
 
 interface AllBlogsProps {
@@ -85,10 +92,10 @@ const AllBlogs: FC<AllBlogsProps> = ({
         .order('created_at', { ascending: false });
       if (error) throw error;
       if (data) {
-        const blogsWithAdmin = data.map(blog => ({
+        const blogsWithAdmin: Blog[] = data.map((blog: any) => ({
           ...blog,
           admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
-        }));
+        })) as Blog[];
         setBlogs(blogsWithAdmin);
         setHasMore((to + 1) < totalCount);
       }
@@ -111,11 +118,11 @@ const AllBlogs: FC<AllBlogsProps> = ({
         .order('created_at', { ascending: false });
       if (error) throw error;
       if (data) {
-        const blogsWithAdmin = data.map(blog => ({
+        const blogsWithAdmin: Blog[] = data.map((blog: any) => ({
           ...blog,
           admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
-        }));
-        setBlogs(prev => [...prev, ...blogsWithAdmin]);
+        })) as Blog[];
+        setBlogs((prev) => [...prev, ...blogsWithAdmin]);
         setHasMore(to < totalBlogs - 1);
       }
     } catch (error) {
@@ -145,19 +152,19 @@ const AllBlogs: FC<AllBlogsProps> = ({
       if (titleRes.error) throw titleRes.error;
       if (authorRes.error) throw authorRes.error;
 
-      const titleBlogs = titleRes.data?.map(blog => ({
+      const titleBlogs: Blog[] = (titleRes.data?.map((blog: any) => ({
         ...blog,
         admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
-      })) || [];
+      })) as Blog[]) || [];
 
-      const authorBlogs = authorRes.data?.map(blog => ({
+      const authorBlogs: Blog[] = (authorRes.data?.map((blog: any) => ({
         ...blog,
         admin: Array.isArray(blog.admins) ? blog.admins[0] : blog.admins
-      })).filter(blog =>
+      })) as Blog[]).filter((blog: Blog) =>
         blog.admin?.username?.toLowerCase().includes(term.toLowerCase())
       ) || [];
 
-      const combined = [...titleBlogs];
+      const combined: Blog[] = [...titleBlogs];
       authorBlogs.forEach(b => {
         if (!combined.find(existing => existing.id === b.id)) {
           combined.push(b);
@@ -262,8 +269,8 @@ const AllBlogs: FC<AllBlogsProps> = ({
             <span className={Styles.AllBlogsCardHeader}>
               {blog.admin?.avatar_url && (
                 <img
-                  src={blog.admin.avatar_url}
-                  alt={blog.admin.username}
+                  src={blog.admin.avatar_url ?? "/avatar.jpg"}
+                  alt={blog.admin.username ?? "Author avatar"}
                   className={Styles.AllBlogsAuthorAvatar}
                 />
               )}

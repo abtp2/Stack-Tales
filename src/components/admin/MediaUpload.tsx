@@ -118,6 +118,10 @@ const MediaUpload = ({ admin }: MediaUploadProps) => {
         abortSignal: abortController.signal,
       });
 
+      if (!uploadResponse.fileId || !uploadResponse.url) {
+        throw new Error("Upload response missing fileId or url");
+      }
+
       const uploadedFile: UploadedMedia = {
         id: uploadResponse.fileId,
         url: uploadResponse.url,

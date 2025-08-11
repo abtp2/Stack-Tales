@@ -1,7 +1,6 @@
 "use client";
-import { FC, memo } from "react";
+import React, { FC, memo } from "react";
 import Markdown from 'react-markdown';
-import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 import Code from "@/components/layout/Code";
 import Styles from "@/app/admin/admin.module.css";
 
@@ -11,6 +10,13 @@ interface ChatMessageProps {
   readonly type: "user" | "ai";
 }
 
+type MarkdownCodeProps = {
+  node?: unknown;
+  inline?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+} & React.HTMLAttributes<HTMLElement>;
+
 const ChatMessage: FC<ChatMessageProps> = memo(({ id, text, type }) => (
   <span className={type === "user" ? Styles.AIBoxUserMessage : Styles.AIBoxAIMessage}>
     {type === "user" ? (
@@ -18,7 +24,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(({ id, text, type }) => (
     ) : (
       <Markdown
         components={{
-          code: ({ node, inline, className, children, ...props }: CodeProps) => {
+          code: ({ node, inline, className, children, ...props }: MarkdownCodeProps) => {
             const match = /language-(\w+)/.exec(className || '');
             const language = match?.[1] ?? '';
             if (!inline && match) {

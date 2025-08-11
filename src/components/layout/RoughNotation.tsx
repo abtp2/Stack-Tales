@@ -1,8 +1,28 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, type FC, type ReactNode } from 'react';
 import { annotate } from 'rough-notation';
 
-const RoughNotation = ({
+type RoughAnnotationTypeLocal =
+  | 'underline'
+  | 'box'
+  | 'circle'
+  | 'highlight'
+  | 'strike-through'
+  | 'crossed-off'
+  | 'bracket';
+
+interface RoughNotationProps {
+  children: ReactNode;
+  type?: RoughAnnotationTypeLocal;
+  color?: string;
+  animate?: boolean;
+  animationDuration?: number;
+  multiline?: boolean;
+  show?: boolean;
+  padding?: number;
+}
+
+const RoughNotation: FC<RoughNotationProps> = ({
   children,
   type = 'underline',
   color = 'rgb(var(--theme))',
@@ -12,7 +32,7 @@ const RoughNotation = ({
   show = true,
   padding = 5
 }) => {
-  const ref = useRef(null);
+  const ref = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     if (ref.current && show) {
@@ -24,7 +44,7 @@ const RoughNotation = ({
         );
       }
 
-      const annotation = annotate(ref.current, {
+      const annotation = annotate(ref.current as HTMLElement, {
         type,
         color: resolvedColor.trim(),
         animate,

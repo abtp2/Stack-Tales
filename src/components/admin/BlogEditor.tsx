@@ -79,7 +79,7 @@ const BlogEditor: FC<BlogEditorProps> = ({
       setBlogTitle(data.title);
       setBlogContent(data.content);
       setBlogSeries(data.series_id);
-      setBlogTags(data.tags);
+      setBlogTags(data.tags || []);
       setEditingBlogData(data);
     }
   };
@@ -122,21 +122,21 @@ const BlogEditor: FC<BlogEditorProps> = ({
     setIsSaving(false);
   };
 
-  const handleClear = (x) => {
-    if(x){
+  const handleClear = (mode?: "confirm") => {
+    if(mode){
       if (window.confirm('Clear all content?')) {
-      setBlogId(null)
-      setBlogTitle("");
-      setBlogContent("");
-      setBlogSeries("");
-      setBlogTags([]);
-      setMessage("");
-    }
+        setBlogId(null)
+        setBlogTitle("");
+        setBlogContent("");
+        setBlogSeries(null);
+        setBlogTags([]);
+        setMessage("");
+      }
     }else{
       setBlogId(null)
       setBlogTitle("");
       setBlogContent("");
-      setBlogSeries("");
+      setBlogSeries(null);
       setBlogTags([]);
     }
   };

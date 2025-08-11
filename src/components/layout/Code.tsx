@@ -1,12 +1,17 @@
 "use client";
+import React, { useState, FC } from "react";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { nightOwl } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Styles from "@/app/blog/blog.module.css";
 import AdminStyles from "@/app/admin/admin.module.css";
 import { LuCopy,LuCheck } from "react-icons/lu";
-import { useState } from "react";
 
-const Code = ({ children, language = "javascript" }) => {
+interface CodeProps {
+  children: string;
+  language?: string;
+}
+
+const Code: FC<CodeProps> = ({ children, language = "javascript" }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

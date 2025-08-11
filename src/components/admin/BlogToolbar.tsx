@@ -14,7 +14,7 @@ interface BlogTool {
 }
 
 interface BlogToolbarProps {
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 const BlogToolbar: React.FC<BlogToolbarProps> = ({ textareaRef }) => {

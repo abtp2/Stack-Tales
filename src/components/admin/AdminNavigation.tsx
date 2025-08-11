@@ -1,6 +1,6 @@
 "use client";
 import { LuPencilLine, LuFileText, LuChartLine, LuImageUp, LuSettings } from "react-icons/lu";
-import { TabType } from "@/types/admin";
+import type { TabType } from "@/types/admin";
 import Styles from "@/app/admin/admin.module.css";
 
 interface AdminNavigationProps {

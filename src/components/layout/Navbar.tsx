@@ -53,8 +53,11 @@ const Navbar = () => {
         setBlogs(defaultSuggestions);
         setFilteredBlogs(defaultSuggestions);
       } else {
-        setBlogs(data || []);
-        setFilteredBlogs(data || []);
+        const normalized: Blog[] = (data || [])
+          .filter((row): row is Blog => typeof row?.title === 'string' && typeof row?.slug === 'string' && row.slug.trim().length > 0)
+          .map(({ title, slug }) => ({ title, slug }));
+        setBlogs(normalized);
+        setFilteredBlogs(normalized);
       }
     } catch (error) {
       console.error("Error:", error);

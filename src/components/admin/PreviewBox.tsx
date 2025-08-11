@@ -23,7 +23,7 @@ interface PreviewBoxProps {
 
 interface AdminDataProps {
   username: string | null;
-  aavatar_url: string | null;
+  avatar_url: string | null;
 }
 
 
@@ -76,7 +76,7 @@ const parseAndRenderContent = (content: string): ReactNode => {
 const PreviewBox: FC<PreviewBoxProps> = memo(
   ({ style, content = "", blogTitle, setBlogTitle, blogSeries, setBlogSeries, blogTags, setBlogTags, admin }) => {
     const renderedContent = useMemo(() => parseAndRenderContent(content), [content]);
-    const [adminData, setAdminData] = useState<AdminDataProps>([]);
+    const [adminData, setAdminData] = useState<AdminDataProps>({ username: null, avatar_url: null });
     const supabase = createClient();
     
     useEffect(() => {
@@ -94,7 +94,6 @@ const PreviewBox: FC<PreviewBoxProps> = memo(
         });
       } catch (err) {
         console.error('Failed to fetch admin data:', err);
-        setError('Could not load admin profile.');
       }
     };
     if (admin?.id) {

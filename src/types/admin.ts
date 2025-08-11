@@ -12,5 +12,5 @@ export interface ChatMessage {
   readonly timestamp: Date;
 }
 
-export type TabType = "createBlog" | "addBlog" | "analytics" | "settings";
+export type TabType = "createBlog" | "addBlog" | "analytics" | "mediaUpload" | "settings";
 export type PreviewTabType = "preview" | "ai";

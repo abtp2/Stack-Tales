@@ -79,7 +79,7 @@ const AdminSettings: React.FC<Props> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [setUserDashbox]);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -141,23 +141,22 @@ const AdminSettings: React.FC<Props> = ({
 
     try {
       setSaving(true);
-      const { data, error } = await supabase
-        .from('admins')
-        .update({
-          username: formData.username,
-          github_url: formData.github_url || null,
-          linkedin_url: formData.linkedin_url || null,
-          readme: formData.readme || null,
-          avatar_url: formData.avatar_url || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', admin.id)
-        .select()
-        .single();
+                             const { data, error } = await supabase
+           .from('admins')
+           .update({
+             username: formData.username,
+             github_url: formData.github_url || null,
+             linkedin_url: formData.linkedin_url || null,
+             readme: formData.readme || null,
+             avatar_url: formData.avatar_url || null,
+             updated_at: new Date().toISOString(),
+           })
+           .eq('id', admin.id)
+           .select()
+           .single();
 
       if (error) throw error;
 
-      setAdmin(data);
       setAdminAvatarUrl(formData.avatar_url);
       setIsEditing(false);
     } catch (err) {
@@ -228,7 +227,7 @@ const AdminSettings: React.FC<Props> = ({
         </fieldset>
         <fieldset>
           <legend>README</legend>
-          <textarea name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} placeholder="Use HTML for readme, just like GitHub"/>
+          <textarea name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} placeholder="Use HTML for readme, just like GitHub"/>
         </fieldset>
 
         <span>

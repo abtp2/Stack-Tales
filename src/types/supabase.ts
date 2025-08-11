@@ -50,6 +50,7 @@ export type Database = {
           linkedin_url: string | null
           name: string | null
           password: string
+          readme: string | null
           role: string | null
           updated_at: string | null
           username: string | null
@@ -64,6 +65,7 @@ export type Database = {
           linkedin_url?: string | null
           name?: string | null
           password: string
+          readme?: string | null
           role?: string | null
           updated_at?: string | null
           username?: string | null
@@ -78,6 +80,7 @@ export type Database = {
           linkedin_url?: string | null
           name?: string | null
           password?: string
+          readme?: string | null
           role?: string | null
           updated_at?: string | null
           username?: string | null
@@ -86,7 +89,7 @@ export type Database = {
       }
       blogs: {
         Row: {
-          author_id: string
+          author_id: string | null
           content: string
           created_at: string
           id: string
@@ -96,6 +99,7 @@ export type Database = {
           tags: string[] | null
           title: string
           updated_at: string
+          views: string[] | null
         }
         Insert: {
           author_id?: string | null
@@ -108,6 +112,7 @@ export type Database = {
           tags?: string[] | null
           title: string
           updated_at?: string
+          views?: string[] | null
         }
         Update: {
           author_id?: string | null
@@ -120,6 +125,7 @@ export type Database = {
           tags?: string[] | null
           title?: string
           updated_at?: string
+          views?: string[] | null
         }
         Relationships: [
           {
