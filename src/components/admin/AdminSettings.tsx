@@ -241,7 +241,7 @@ const AdminSettings: React.FC<Props> = ({
             </button>
           )}
           <button type="button" onClick={handleLogout} className={Styles.logoutButton} disabled={saving || loggingOut}>
-            {loggingOut ? (<><LuLoaderCircle/> Logging out</>) : (<><LuLogOut/> Log out</>)}
+            {loggingOut ? (<><LuLoaderCircle className="LoaderSpin"/> Logging out</>) : (<><LuLogOut/> Log out</>)}
           </button>
         </span>
       </div>

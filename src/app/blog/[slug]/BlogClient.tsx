@@ -64,7 +64,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
   const [blog, setBlog] = useState<any>(null);
   const [Author, setAuthor] = useState<any>(null);
   const [error, setError] = useState<string>('');
-  const [blogSeries, setBlogSeries] = useState<string >('');
+  const [blogSeries, setBlogSeries] = useState<{ name: string } | null>(null);
   const [blogViews, setBlogViews] = useState<string[]>([]);
   
   const shareToTwitter = () => {
@@ -128,49 +128,23 @@ export default function BlogClient({ slug }: BlogClientProps) {
       }
       
       // Fetch blog series
-      const { data: SeriesData, error: SeriesError } = await supabase
-        .from('series')
-        .select('name')
-        .eq('id', blogData.series_id)
-        .single();
-      if (!SeriesData) {
+      if (blogData.series_id) {
+        const { data: SeriesData, error: SeriesError } = await supabase
+          .from('series')
+          .select('name')
+          .eq('id', blogData.series_id)
+          .single();
+        if (SeriesData) {
+          setBlogSeries(SeriesData);
+        } else {
+          setBlogSeries(null);
+        }
+      } else {
         setBlogSeries(null);
       }
       
-      // Views
-        const viewsStorage = JSON.parse(sessionStorage.getItem("StackTales-views") || "[]");
-        if (!viewsStorage.some(item => item.id === blogData.id)) {
-          const date = Date.now();
-          // Fetch current views (optional — if you don't need existing views, skip this)
-          const { data: viewsData, error: viewsError } = await supabase
-            .from('blogs')
-            .select('views')
-            .eq('id', blogData.id)
-            .single();
-          if (viewsError) {
-            console.error("Error fetching views:", viewsError);
-            return;
-          }
-          // Add current date to views array
-          const updatedViews = Array.isArray(viewsData.views) ? [...viewsData.views, date] : [date];
-          const { data, error } = await supabase
-            .from('blogs')
-            .update({ views: updatedViews })
-            .eq('id', blogData.id);
-          if (error) {
-            console.error("Error updating views:", error);
-            return;
-          }
-          // Update sessionStorage
-          const updatedStorage = [...viewsStorage, { id: blogData.id, date }];
-          sessionStorage.setItem("StackTales-views", JSON.stringify(updatedStorage));
-        }
-        
-      
-      
       setBlog(blogData);
       setAuthor(AuthorData);
-      setBlogSeries(SeriesData);
       setLoading(false);
     };
     
@@ -205,7 +179,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
     <section>
       {blog.tags.length > 0 && (
         <div className={`${Styles.blogTags} overflow-none`}>
-          {blog.tags.map((tag) => (
+          {blog.tags.map((tag: string) => (
             <p key={tag}>{tag}</p>
           ))}
         </div>

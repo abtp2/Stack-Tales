@@ -19,5 +19,5 @@ export default async function AdminPage() {
     return <AdminAuth />
   }
   
-  return <AdminWrapper admin={admin as User} />
+  return <AdminWrapper admin={user} />
 }

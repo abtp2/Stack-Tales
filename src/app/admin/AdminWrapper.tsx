@@ -23,6 +23,6 @@ export default function AdminPanelWrapper({ admin }: { admin: User }) {
   }, [])
   
 
-  if (!currentAdmin) return <AdminAuth setAdmin={setCurrentAdmin}/>
+  if (!currentAdmin) return <AdminAuth/>
   return <AdminPanel admin={currentAdmin} setAdmin={setCurrentAdmin} />
 }
