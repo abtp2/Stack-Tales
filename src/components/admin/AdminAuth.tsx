@@ -3,7 +3,7 @@ import { LuLogIn, LuLoaderCircle } from 'react-icons/lu'
 import Logo from '@/components/layout/Logo'
 import Styles from '@/app/admin/admin.module.css'
 import { useState } from 'react'
-import { login } from '@/app/auth/login/route'
+import { login } from '@/app/admin/login-action'
 
 export default function AdminAuth() {
   const [loading, setLoading] = useState(false)
