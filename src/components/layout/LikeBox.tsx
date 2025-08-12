@@ -1,13 +1,13 @@
 "use client";
 import Styles from "@/app/blog/blog.module.css";
-import { BiSolidLike, BiSolidDislike} from "react-icons/bi";
-import { LuSend, LuLoaderCircle } from "react-icons/lu";
+import { LuSend, LuLoaderCircle, LuCheck } from "react-icons/lu";
 import { useState, useEffect, useRef } from "react";
 
 const LikeBox = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const [sending, setSending] = useState<boolean>(false);
   const [text, setText] = useState<string>('');
+  const [selectedOption, setSelectedOption] = useState<string>("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -17,10 +17,13 @@ const LikeBox = () => {
     }
   }, [visible]);
   
+  const openTextarea = (type: boolean) => {
+    setVisible(true);
+    setSelectedOption(type ? "Yes" : "No");
+  }
 
   const handleSend = async () => {
-    if (!text.trim()) return;
-    const message = `Query from blog:\n\`${window.location.href}\`\n\n${text}`;
+    const message = `*Feedback from blog:*\n\`${window.location.href}\`\n\n*Was this blog helpful:* ${selectedOption}\n${text ? `*Message:* ${text}` : ""}`;
     setSending(true);
     try {
       const res = await fetch('/api/sendTelegramMessage', {
@@ -44,19 +47,19 @@ const LikeBox = () => {
       alert('Failed to send message. Please try again.');
     } finally {
       setSending(false);
+      setVisible(false);
+      setSelectedOption("");
     }
   };
   
-  useEffect(() => {
-    handleSend();
-  }, [])
-  
   return(
-    <div className={Styles.likeBox} onMouseLeave={()=>{setVisible(false)}}>
+    <div className={Styles.likeBox}>
       <span>
         <p>Was This Blog Helpful?</p>
-        <div className={Styles.likeBoxIcon} onMouseEnter={()=>{setVisible(true)}}><BiSolidLike/></div>
-        <div className={Styles.likeBoxIcon} onMouseEnter={()=>{setVisible(true)}}><BiSolidDislike/></div>
+        <div className={Styles.likeBoxIcon}>
+          <button onClick={()=>{openTextarea(true)}}>Yes {selectedOption === "Yes" && <LuCheck/>}</button>
+          <button onClick={()=>{openTextarea(false)}}>No {selectedOption === "No" && <LuCheck/>}</button>
+        </div>
       </span>
       <textarea ref={textareaRef} placeholder="Your feedback..." className={visible ? Styles.showLikeBoxTextarea : ""} value={text} onChange={(e) => setText(e.target.value)}/>
       <div className={`${visible ? Styles.showLikeBoxTextarea : ""} ${Styles.LikeBoxButton}`}><button className={sending ? Styles.LikeBoxButtonInactive : ""} onClick={()=>{handleSend()}}>Send {sending ? <LuLoaderCircle className="LoaderSpin"/> : <LuSend/>}</button></div>
