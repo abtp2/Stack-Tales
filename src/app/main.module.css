@@ -103,6 +103,28 @@ text-align: left;
 border: 1px solid rgba(var(--color),0.1);
 box-shadow: 0 4px 6px -1px rgba(var(--lcolor),0.05),
             0 2px 4px -1px rgba(var(--lcolor),0.05);
+transition: all 0.3s;
+}
+/*
+.heroCard:nth-of-type(1) {
+  transform: rotate(1.5deg);
+}
+.heroCard:nth-of-type(2) {
+  transform: rotate(0deg);
+}
+.heroCard:nth-of-type(3) {
+  transform: rotate(-1deg);
+}
+.heroCard:nth-of-type(4) {
+  transform: rotate(1deg);
+}
+.heroCard:nth-of-type(5) {
+  transform: rotate(-1.5deg);
+}
+*/
+
+.heroCard:hover{
+transform: rotate(0deg) scale(1.02);
 }
 .heroCard span{
 display: flex;
