@@ -6,21 +6,22 @@ align-items: center;
 gap: 1rem;
 padding: 1rem;
 background: var(--fade);
-/* box-shadow: 0 3px 5px -2px rgba(var(--lcolor),0.05); */
+ box-shadow: 0 3px 5px -2px rgba(var(--lcolor),0.05);
 border: 1px solid rgba(var(--color),0.1);
 }
 .blogTags p{
-padding: 5px 8px;
+padding: 5px 10px;
 border-radius: 5px;
-border: 2px dashed rgba(var(--color), 0.1);
+border: 1.5px dashed rgba(var(--color), 0.1);
 color: rgba(var(--color), 0.8);
 font-size: 14px;
+white-space: nowrap;
 }
 @media (min-width: 768px){
   .blogTags{
     border-radius: 50px;
     margin-top: 1rem;
-    padding: 1rem 2rem;
+    padding: 12px 2rem;
   }
 }
 .blogSeriesBox{
@@ -240,8 +241,8 @@ pointer-events: auto;
 .likeBox{
 width: 95%;
 max-width: 400px;
-border-radius: 5px;
-border: 1px solid rgba(var(--color),0.2);
+border-radius: 6px;
+border: 1px solid rgba(var(--color),0.1);
 display: flex;
 flex-direction: column;
 align-items: center;
@@ -295,8 +296,8 @@ width: 100%;
 min-height: 120px;
 background: transparent;
 border: none;
-border-top: 1px solid rgba(var(--color),0.2);
-border-bottom: 1px solid rgba(var(--color),0.2);
+border-top: 1px solid rgba(var(--color),0.1);
+border-bottom: 1px solid rgba(var(--color),0.1);
 resize: vertical;
 font-family: "Inter", sans-serif;
 font-size: 14px;
