@@ -239,7 +239,7 @@ pointer-events: auto;
 
 /* Like Box */
 .likeBox{
-width: 95%;
+width: 90%;
 max-width: 400px;
 border-radius: 6px;
 border: 1px solid rgba(var(--color),0.1);
