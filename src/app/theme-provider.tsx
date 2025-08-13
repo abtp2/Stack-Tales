@@ -13,7 +13,7 @@ const ThemeContext = createContext<ThemeContextType>({
 })
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light')
+  const [theme, setThemeState] = useState<Theme>('dark')
   // Load theme from localStorage on mount
   useEffect(() => {
     const storedTheme = localStorage.getItem('StackTales-theme') as Theme | null
