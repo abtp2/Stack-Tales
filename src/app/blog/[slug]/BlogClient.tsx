@@ -8,6 +8,7 @@ import LikeBox from "@/components/layout/LikeBox";
 import { LuTwitter, LuChevronRight, LuSquareLibrary } from "react-icons/lu";
 import { FaLinkedin } from "react-icons/fa";
 import LoadingPlaceholder from "@/components/layout/LoadingPlaceholder";
+import Footer from "@/components/layout/Footer";
 
 interface BlogClientProps {
   slug: string;
@@ -218,6 +219,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
         </div>
       </main>
       <LikeBox/>
+      <Footer/>
     </section>
   );
 }
