@@ -53,7 +53,8 @@ const heroCards = [
       <div className={Styles.hero}>
         <section>
           <p><LuSparkles className={Styles.sparkleIcon}/> Latest Dev Blogs</p>
-          <h1>DEMYSTIFYING <span>{"<CODE/>"} </span> AND STACKS WITH <RoughNotation>SIMPLICITY</RoughNotation></h1>
+          <h1>DEMYSTIFYING <span>{"<CODE/>"} </span> & STACKS WITH <RoughNotation>SIMPLICITY</RoughNotation></h1>
+          <h3>"We make code and stacks easy to understand by breaking down complex ideas into clear, practical insights — no jargon, just concepts that click."</h3>
           <div className={Styles.heroAvatars}>
             {[...Array(6)].map((_, i) => (
               <span key={i}>

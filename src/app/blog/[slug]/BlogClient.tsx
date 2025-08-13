@@ -186,7 +186,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
       {blog.tags.length > 0 && (
         <div className={`${Styles.blogTags} overflow-none`}>
           {blog.tags.map((tag: string) => (
-            <p key={tag}>{tag}</p>
+            <p key={tag}>#{tag}</p>
           ))}
         </div>
       )}

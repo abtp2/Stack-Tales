@@ -6,7 +6,7 @@ align-items: center;
 gap: 1rem;
 padding: 1rem;
 background: var(--fade);
- box-shadow: 0 3px 5px -2px rgba(var(--lcolor),0.05);
+box-shadow: 0 3px 3px -2px rgba(var(--lcolor),0.1);
 border: 1px solid rgba(var(--color),0.1);
 }
 .blogTags p{
@@ -241,13 +241,15 @@ pointer-events: auto;
 .likeBox{
 width: 90%;
 max-width: 400px;
-border-radius: 6px;
+border-radius: 8px;
 border: 1px solid rgba(var(--color),0.1);
+box-shadow: 0 3px 3px -2px rgba(var(--lcolor),0.1);
 display: flex;
 flex-direction: column;
 align-items: center;
 margin: 1rem auto 20rem auto;
 overflow: hidden;
+background: rgba(var(--color), 0.05);
 }
 .likeBox span{
 width: 100%;
@@ -255,7 +257,7 @@ display: flex;
 flex-wrap: wrap;
 align-items: center;
 row-gap: 1rem;
-padding: 12px 1rem;
+padding: 1rem 1rem;
 background: var(--fade);
 }
 .likeBox p{
@@ -296,8 +298,8 @@ width: 100%;
 min-height: 120px;
 background: transparent;
 border: none;
-border-top: 1px solid rgba(var(--color),0.1);
-border-bottom: 1px solid rgba(var(--color),0.1);
+border-top: 1px solid rgba(var(--color),0.15);
+border-bottom: 1px solid rgba(var(--color),0.15);
 resize: vertical;
 font-family: "Inter", sans-serif;
 font-size: 14px;

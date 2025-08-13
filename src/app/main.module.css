@@ -34,7 +34,6 @@ width: 18px;
 height: 18px;
 }
 .hero h1{
-max-width: 600px;
 margin: 0 auto;
 padding: 0 1rem;
 font-size: 2rem;
@@ -42,6 +41,20 @@ font-family: "Changa One", sans-serif;
 font-weight: 400;
 font-style: normal;
 line-height: 1.6;
+color: rgba(var(--color), 0.9);
+word-spacing: 5px;
+}
+.hero h3{
+max-width: 700px;
+margin: 1rem auto;
+padding: 0 1rem;
+font-size: 1rem;
+font-family: "Inter", sans-serif;
+font-weight: 400;
+font-style: italic;
+line-height: 1.7;
+color: rgba(var(--color), 0.9);
+text-align: center;
 }
 .hero span:nth-of-type(1){
 color: rgba(var(--color), 0.5);
@@ -100,31 +113,18 @@ background: var(--fade);
 border-radius: 10px;
 padding: 1rem;
 text-align: left;
-border: 1px solid rgba(var(--color),0.1);
+border: 1.5px solid rgba(var(--color),0.1);
 box-shadow: 0 4px 6px -1px rgba(var(--lcolor),0.05),
             0 2px 4px -1px rgba(var(--lcolor),0.05);
 transition: all 0.3s;
 }
-/*
-.heroCard:nth-of-type(1) {
-  transform: rotate(1.5deg);
-}
-.heroCard:nth-of-type(2) {
-  transform: rotate(0deg);
-}
-.heroCard:nth-of-type(3) {
-  transform: rotate(-1deg);
-}
-.heroCard:nth-of-type(4) {
-  transform: rotate(1deg);
-}
-.heroCard:nth-of-type(5) {
-  transform: rotate(-1.5deg);
-}
-*/
 
-.heroCard:hover{
-transform: rotate(0deg) scale(1.02);
+
+.heroCard:hover button svg{
+width: 35px;
+height: 25px;
+border-radius: 50px;
+text-align: right;
 }
 .heroCard span{
 display: flex;
@@ -139,7 +139,7 @@ padding: 10px;
 border-radius: 5px;
 }
 .heroCard span h2{
-font-size: 20px;
+font-size: 18px;
 color: rgba(var(--color));
 margin-top: 1rem;
 }
@@ -177,12 +177,6 @@ background: rgba(var(--color));
 padding: 5px;
 border-radius: 100%;
 transition: all 0.3s;
-}
-.heroCard button:hover svg{
-width: 40px;
-height: 25px;
-border-radius: 50px;
-text-align: right;
 }
 
 
