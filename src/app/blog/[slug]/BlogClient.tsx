@@ -195,24 +195,26 @@ export default function BlogClient({ slug }: BlogClientProps) {
           <p><LuSquareLibrary/> &nbsp;|&nbsp; <span>{blogSeries.name}</span> <LuChevronRight/> <span>{blog.title}</span></p>
         </div>
       )}
-      <main className={Styles.blogContainer}>
-        <div className={Styles.blogTitle}>
-          <h2>{blog.title}</h2>
-          <span>
-            <img src={Author.avatar_url} alt={Author.username} />
-            <h1>{Author.username} <p>{new Date(blog.created_at).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}</p></h1>
-          </span>
-          <div>
-            <p onClick={()=>{shareToTwitter()}}><LuTwitter /> Share on Twitter</p>
-            <p onClick={()=>{shareToLinkedIn()}}><FaLinkedin /> Share on LinkedIn</p>
+      <main>
+        <div className={Styles.blogContainer}>
+          <div className={Styles.blogTitle}>
+            <h2>{blog.title}</h2>
+            <span>
+              <img src={Author.avatar_url} alt={Author.username} />
+              <h1>{Author.username} <p>{new Date(blog.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}</p></h1>
+            </span>
+            <div>
+              <p onClick={()=>{shareToTwitter()}}><LuTwitter /> Share on Twitter</p>
+              <p onClick={()=>{shareToLinkedIn()}}><FaLinkedin /> Share on LinkedIn</p>
+            </div>
           </div>
-        </div>
-        <div className={Styles.blogContent}>
-          {renderedContent}
+          <div className={Styles.blogContent}>
+            {renderedContent}
+          </div>
         </div>
       </main>
       <LikeBox/>
