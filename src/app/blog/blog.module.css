@@ -247,7 +247,7 @@ box-shadow: 0 3px 3px -2px rgba(var(--lcolor),0.1);
 display: flex;
 flex-direction: column;
 align-items: center;
-margin: 1rem auto 20rem auto;
+margin: 1rem auto 8rem auto;
 overflow: hidden;
 background: rgba(var(--color), 0.05);
 }

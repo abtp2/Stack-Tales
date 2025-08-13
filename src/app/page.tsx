@@ -3,6 +3,7 @@ import RoughNotation from "@/components/layout/RoughNotation";
 import LatestBlogs from "@/components/layout/LatestBlogs";
 import TrendingTags from "@/components/layout/TrendingTags";
 import FeaturedSeries from "@/components/layout/FeaturedSeries";
+import Footer from "@/components/layout/Footer";
 import Styles from "./main.module.css";
 import LayoutStyles from "@/components/layout/layout.module.css";
 import {LuSparkles, LuArrowRight, LuCode, LuFileText, LuWrench, LuActivity, LuUsers} from "react-icons/lu";
@@ -81,6 +82,7 @@ const heroCards = [
             <FeaturedSeries/>
           </div>
       </section>
+      <Footer/>
     </>
   );
 }
