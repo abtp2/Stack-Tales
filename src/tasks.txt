@@ -1,2 +1,8 @@
 Make on this page section in blog page.
 Change UI of "Was this blog helpfull?" - use vs code blog page for it.
+
+
+
+git add .
+git commit -m "update"
+git push
