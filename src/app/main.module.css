@@ -215,6 +215,7 @@ background: var(--fade);
 padding: 1.5rem 2rem;
 margin: 2rem auto 0 auto;
 border-radius: 10px 10px 0 0;
+border: 1px solid rgba(var(--color),0.1);
 }
 .footer .footerLinks{
 width: 100%;
@@ -247,11 +248,12 @@ border-left: 1.5px solid rgba(var(--color),0);
 }
 .footer .footerLinksDiv p a{
 color: rgba(var(--color), 0.5);
-text-decoration: underline;
 }
 .footer .footerLinksDiv p:hover{
 border-left: 1.5px solid rgba(var(--color));
 color: rgba(var(--color), 1);
 }
-
+.footer .footerLinksDiv p:hover a{
+text-decoration: underline;
+}
 
