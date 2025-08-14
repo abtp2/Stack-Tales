@@ -1,6 +1,7 @@
 import React from 'react';
 import Styles from "@/app/main.module.css";
 import Logo from './Logo';
+import { LuCopyright } from "react-icons/lu";
 
 
 const Footer = () => {
@@ -39,6 +40,7 @@ const Footer = () => {
                 <p><a href="#">ExpressJS</a></p>
             </div>
         </div>
+        <h2> <LuCopyright/> {new Date().getFullYear()} StackTales. All rights reserved</h2>
     </section>
   )
 }
