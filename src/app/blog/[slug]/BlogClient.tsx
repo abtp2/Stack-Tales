@@ -169,7 +169,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
 
   if (loading) {
     return (
-      <LoadingPlaceholder/>
+      <LoadingPlaceholder />
     );
   }
 
@@ -183,7 +183,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
   }
 
   return (
-    <section>
+    <section style={{paddingTop:'65px'}}>
       {blog.tags.length > 0 && (
         <div className={`${Styles.blogTags} overflow-none`}>
           {blog.tags.map((tag: string) => (

@@ -845,6 +845,9 @@ border-radius: 5px;
 
 
 
+
+
+
 /* Admin Settings */
 .dashboxBlur > *:not(nav){
 filter: blur(1px);

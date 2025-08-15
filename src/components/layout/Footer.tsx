@@ -1,5 +1,5 @@
 import React from 'react';
-import Styles from "@/app/main.module.css";
+import Styles from "./layout.module.css";
 import Logo from './Logo';
 import { LuCopyright } from "react-icons/lu";
 

@@ -3,7 +3,7 @@ width: 100%;
 display: flex;
 flex-direction: column;
 align-items: center;
-padding: 4rem 0 3rem 0;
+padding: 130px 0 3rem 0; /* padding-top: 65px(nav) + 4rem */
 text-align: center;
 background-color: transparent;
 background-image: 
@@ -205,68 +205,4 @@ flex-direction: column;
   }
 }
 
-
-.footer{
-width: 100%;
-display: flex;
-flex-direction: column;
-align-items: flex-start;
-background: var(--fade);
-padding: 1.5rem 1.5rem 0 1.5rem;
-margin: 5rem auto 0 auto;
-border-radius: 10px 10px 0 0;
-border: 1px solid rgba(var(--color),0.1);
-}
-.footer .footerLinks{
-width: 100%;
-display: flex;
-flex-wrap: wrap;
-align-items: flex-start;
-row-gap: 2rem;
-column-gap: 2rem;
-margin-top: 2rem;
-}
-
-.footer .footerLinksDiv{
-display: flex;
-flex-direction: column;
-}
-.footer .footerLinksDiv h1{
-font-size: 15px;
-font-weight: 600;
-color: rgba(var(--color),0.9);
-padding-bottom: 5px;
-}
-.footer .footerLinksDiv p{
-width: fit-content;
-font-size: 14px;
-color: rgba(var(--color), 0.6);
-padding: 8px 0 8px 10px;
-margin-left: 2px;
-border-left: 1.5px solid rgba(var(--color),0.1);
-}
-.footer .footerLinksDiv p a{
-color: rgba(var(--color), 0.5);
-}
-.footer .footerLinksDiv p:hover{
-border-left: 1.5px solid rgba(var(--color));
-color: rgba(var(--color), 1);
-}
-.footer .footerLinksDiv p:hover a{
-text-decoration: underline;
-}
-.footer h2{
-width: 100%;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 5px;
-font-size: 15px;
-font-weight: 400;
-color: rgba(var(--color),0.8);
-padding: 1rem 0;
-margin-top: 4rem;
-border-top: 1px solid rgba(var(--color),0.08);
-text-align: center;
-}
 
