@@ -2,7 +2,9 @@ Make on this page section in blog page.
 Change UI of "Was this blog helpfull?" - use vs code blog page for it.
 
 
-
-git add .
-git commit -m "update"
-git push
+Analytics{
+ views - month/week/all
+ storage - supabase/imagekit
+ blog scroll OR read time
+ source - google/telegram/youtube/anyother
+}

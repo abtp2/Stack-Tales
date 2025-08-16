@@ -66,7 +66,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
   const [Author, setAuthor] = useState<any>(null);
   const [error, setError] = useState<string>('');
   const [blogSeries, setBlogSeries] = useState<{ name: string } | null>(null);
-  const [blogViews, setBlogViews] = useState<string[]>([]);
+  const supabase = createClient();
   
   const shareToTwitter = () => {
     const twitterURL = `https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`
@@ -77,10 +77,33 @@ export default function BlogClient({ slug }: BlogClientProps) {
     window.open(linkedInURL, '_blank', 'noopener,noreferrer')
   }
   
+  // BlogClicks
+  const handleBlogClicks = async ()=>{
+    // Fetch current clicks
+    const { data: clicksData, error: clicksError } = await supabase
+      .from('blogs')
+      .select('clicks')
+      .eq('slug', slug)
+      .single();
+      if (clicksError) {
+        console.error("Error fetching clicks:", clicksError);
+        return;
+      }
+    // update clicks
+    const updatedClicks = clicksData?.clicks + 1;
+    const { data, error } = await supabase
+      .from('blogs')
+      .update({ clicks: updatedClicks })
+      .eq('slug', slug)
+      if (error) {
+        console.error("Error updating clicks:", error);
+        return;
+      }
+  }
+  
   useEffect(() => {
     const fetchData = async () => {
       console.log('Fetching blog with slug:', slug);
-      const supabase = createClient();
       
       // First, let's check what blogs exist
       const { data: allBlogs, error: allBlogsError } = await supabase
@@ -150,6 +173,35 @@ export default function BlogClient({ slug }: BlogClientProps) {
         setBlogSeries(null);
       }
       
+      // Views
+        const viewsStorage = JSON.parse(sessionStorage.getItem("StackTales-views") || "[]");
+        if (!viewsStorage.some(item => item.id === blogData.id)) {
+          const date = Date.now();
+          // Fetch current views (optional — if you don't need existing views, skip this)
+          const { data: viewsData, error: viewsError } = await supabase
+            .from('blogs')
+            .select('views')
+            .eq('id', blogData.id)
+            .single();
+          if (viewsError) {
+            console.error("Error fetching views:", viewsError);
+            return;
+          }
+          // Add current date to views array
+          const updatedViews = Array.isArray(viewsData.views) ? [...viewsData.views, date] : [date];
+          const { data, error } = await supabase
+            .from('blogs')
+            .update({ views: updatedViews })
+            .eq('id', blogData.id);
+          if (error) {
+            console.error("Error updating views:", error);
+            return;
+          }
+          // Update sessionStorage
+          const updatedStorage = [...viewsStorage, { id: blogData.id, date }];
+          sessionStorage.setItem("StackTales-views", JSON.stringify(updatedStorage));
+        }
+      
       setBlog(blogData);
       setAuthor(AuthorData);
       setLoading(false);
@@ -183,7 +235,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
   }
 
   return (
-    <section style={{paddingTop:'65px'}}>
+    <section style={{paddingTop:'65px'}} onClick={()=>{handleBlogClicks()}}>
       {blog.tags.length > 0 && (
         <div className={`${Styles.blogTags} overflow-none`}>
           {blog.tags.map((tag: string) => (
