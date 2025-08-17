@@ -79,26 +79,14 @@ export default function BlogClient({ slug }: BlogClientProps) {
   
   // BlogClicks
   const handleBlogClicks = async ()=>{
-    // Fetch current clicks
-    const { data: clicksData, error: clicksError } = await supabase
-      .from('blogs')
-      .select('clicks')
-      .eq('slug', slug)
-      .single();
-      if (clicksError) {
-        console.error("Error fetching clicks:", clicksError);
-        return;
-      }
-    // update clicks
-    const updatedClicks = clicksData?.clicks + 1;
     const { data, error } = await supabase
-      .from('blogs')
-      .update({ clicks: updatedClicks })
-      .eq('slug', slug)
-      if (error) {
-        console.error("Error updating clicks:", error);
-        return;
-      }
+    .rpc('increment_column_by_slug', {
+      row_slug: slug,
+      increment_amount: 1
+    })
+    if (error) {
+      console.error('RPC error:', JSON.stringify(error))
+    }
   }
   
   useEffect(() => {
