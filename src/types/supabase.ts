@@ -197,7 +197,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_column_by_slug: {
+        Args: { increment_amount: number; row_slug: string }
+        Returns: {
+          clicks: number
+          slug: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
