@@ -29,6 +29,10 @@ const AdminSettings: React.FC<Props> = ({
     username: '',
     github_url: '',
     linkedin_url: '',
+    telegram_url: '',
+    twitter_url: '',
+    youtube_url: '',
+    website_url: '',
     readme: '',
     avatar_url: '',
   });
@@ -46,7 +50,7 @@ const AdminSettings: React.FC<Props> = ({
       try {
         const { data, error } = await supabase
           .from('admins')
-          .select('username, github_url, linkedin_url, readme, avatar_url')
+          .select('username, github_url, linkedin_url, telegram_url, twitter_url, youtube_url, website_url, readme, avatar_url')
           .eq('id', admin.id)
           .single();
         if (error) throw error;
@@ -54,6 +58,10 @@ const AdminSettings: React.FC<Props> = ({
           username: data.username || '',
           github_url: data.github_url || '',
           linkedin_url: data.linkedin_url || '',
+          telegram_url: data.telegram_url || '',
+          twitter_url: data.twitter_url || '',
+          youtube_url: data.youtube_url || '',
+          website_url: data.website_url || '',
           readme: data.readme || '',
           avatar_url: data.avatar_url || '',
         });
@@ -147,6 +155,10 @@ const AdminSettings: React.FC<Props> = ({
              username: formData.username,
              github_url: formData.github_url || null,
              linkedin_url: formData.linkedin_url || null,
+             telegram_url: formData.telegram_url || null,
+             twitter_url: formData.twitter_url || null,
+             youtube_url: formData.youtube_url || null,
+             website_url: formData.website_url || null,
              readme: formData.readme || null,
              avatar_url: formData.avatar_url || null,
              updated_at: new Date().toISOString(),
@@ -215,19 +227,35 @@ const AdminSettings: React.FC<Props> = ({
       <div className={Styles.dashboxForm}>
         <fieldset>
           <legend>Username</legend>
-          <input name="username" value={formData.username} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} />
+          <input type="text" name="username" value={formData.username} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} />
         </fieldset>
         <fieldset>
           <legend>GitHub</legend>
-          <input name="github_url" value={formData.github_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
+          <input type="url" name="github_url" value={formData.github_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} required/>
         </fieldset>
         <fieldset>
           <legend>LinkedIn</legend>
-          <input name="linkedin_url" value={formData.linkedin_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
+          <input type="url" name="linkedin_url" value={formData.linkedin_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
+        </fieldset>
+        <fieldset>
+          <legend>Telegram</legend>
+          <input type="url" name="telegram_url" value={formData.telegram_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
+        </fieldset>
+        <fieldset>
+          <legend>Twitter</legend>
+          <input type="url" name="twitter_url" value={formData.twitter_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
+        </fieldset>
+        <fieldset>
+          <legend>YouTube</legend>
+          <input type="url" name="youtube_url" value={formData.youtube_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
+        </fieldset>
+        <fieldset>
+          <legend>Website</legend>
+          <input type="url" name="website_url" value={formData.website_url} onChange={handleInputChange} disabled={!isEditing || saving  || loggingOut} />
         </fieldset>
         <fieldset>
           <legend>README</legend>
-          <textarea name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} placeholder="Use HTML for readme, just like GitHub"/>
+          <textarea type="text" name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} placeholder="Use HTML for readme, just like GitHub" required/>
         </fieldset>
 
         <span>

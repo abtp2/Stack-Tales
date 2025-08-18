@@ -48,12 +48,15 @@ export type Database = {
           id: string
           last_logout: string | null
           linkedin_url: string | null
-          name: string | null
           password: string
           readme: string | null
           role: string | null
+          telegram_url: string | null
+          twitter_url: string | null
           updated_at: string | null
           username: string | null
+          website_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -63,12 +66,15 @@ export type Database = {
           id?: string
           last_logout?: string | null
           linkedin_url?: string | null
-          name?: string | null
           password: string
           readme?: string | null
           role?: string | null
+          telegram_url?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -78,12 +84,15 @@ export type Database = {
           id?: string
           last_logout?: string | null
           linkedin_url?: string | null
-          name?: string | null
           password?: string
           readme?: string | null
           role?: string | null
+          telegram_url?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
+          website_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }

@@ -1,9 +1,11 @@
 'use client';
 import { useState, useEffect } from "react";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, notFound } from 'next/navigation';
 import Navbar from "@/components/layout/Navbar";
 import { createClient } from '@/lib/supabase/client';
 import LoadingPlaceholder from "@/components/layout/LoadingPlaceholder";
+import Styles from "./author.module.css";
+import { FaGithub, FaLinkedin, FaTwitter, FaTelegram, FaYoutube } from "react-icons/fa";
 
 interface Author {
   username: string;
@@ -32,7 +34,7 @@ export default function AuthorPage() {
 
       const { data, error } = await supabase
         .from('admins')
-        .select('username, avatar_url, github_url, linkedin_url, readme')
+        .select('username, avatar_url, github_url, linkedin_url, telegram_url, twitter_url, youtube_url, website_url, readme')
         .ilike('username', authorName)
         .limit(1);
 
@@ -57,22 +59,36 @@ export default function AuthorPage() {
       <Navbar />
       <section style={{ paddingTop: '65px' }}>
         {loading && <LoadingPlaceholder/>}
-        {error && <p>{error}</p>}
-        
+        {error && notFound()}
         {authorData && (
-          <div>
-            <h2>{authorData.username}</h2>
+          <div className={Styles.container}>
             {authorData.avatar_url && (
               <img src={authorData.avatar_url} alt={authorData.username} width={100} height={100}/>
             )}
-            {authorData.github_url && (
-              <a href={authorData.github_url} target="_blank">GitHub</a>
-            )}
-            {authorData.linkedin_url && (
-              <a href={authorData.linkedin_url} target="_blank">LinkedIn</a>
-            )}
+            <div className={Styles.head}>
+              {authorData.username && (
+                <h1>{authorData.username}</h1>
+              )}
+              <span>
+                {authorData.github_url && (
+                  <a href={authorData.github_url}><FaGithub className={Styles.authorIcons}/></a>
+                )}
+                {authorData.linkedin_url && (
+                  <a href={authorData.linkedin_url}><FaLinkedin  className={Styles.authorIcons}/></a>
+                )}
+                {authorData.twitter_url && (
+                  <a href={authorData.twitter_url}><FaTwitter className={Styles.authorIcons}/></a>
+                )}
+                {authorData.telegram_url && (
+                  <a href={authorData.telegram_url}><FaTelegram className={Styles.authorIcons}/></a>
+                )}
+                {authorData.youtube_url && (
+                  <a href={authorData.youtube_url}><FaYoutube className={Styles.authorIcons}/></a>
+                )}
+              </span>
+            </div>
             {authorData.readme && (
-              <pre style={{ whiteSpace: "pre-wrap" }}>{authorData.readme}</pre>
+              <p dangerouslySetInnerHTML={{ __html: authorData.readme }}></p>
             )}
           </div>
         )}
