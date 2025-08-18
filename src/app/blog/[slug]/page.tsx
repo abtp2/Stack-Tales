@@ -10,9 +10,9 @@ export default async function BlogPage({ params }: BlogProps) {
   const { slug } = await params;
   
   return (
-    <>
+    <div style={{paddingTop:'65px'}}>
       <Navbar />
       <BlogClient slug={slug} />
-    </>
+    </div>
   );
 }

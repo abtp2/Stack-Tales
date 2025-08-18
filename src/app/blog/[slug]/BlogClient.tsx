@@ -223,7 +223,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
   }
 
   return (
-    <section style={{paddingTop:'65px'}} onClick={()=>{handleBlogClicks()}}>
+    <section onClick={()=>{handleBlogClicks()}}>
       {blog.tags.length > 0 && (
         <div className={`${Styles.blogTags} overflow-none`}>
           {blog.tags.map((tag: string) => (
