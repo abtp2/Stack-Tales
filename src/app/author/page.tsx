@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, notFound } from 'next/navigation';
 import Navbar from "@/components/layout/Navbar";
 import { createClient } from '@/lib/supabase/client';
@@ -21,7 +21,7 @@ type Author = Pick<
   | 'readme'
 >;
 
-export default function AuthorPage() {
+function AuthorContent() {
   const [loading, setLoading] = useState<boolean>(false);
   const [authorData, setAuthorData] = useState<Author | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -66,42 +66,52 @@ export default function AuthorPage() {
 
   return (
     <>
+      {loading && <LoadingPlaceholder/>}
+      {error && notFound()}
+      {authorData && (
+        <div className={Styles.container}>
+          {authorData.avatar_url && (
+            <img src={authorData.avatar_url} alt={authorData.username ?? ''} width={100} height={100}/>
+          )}
+          <div className={Styles.head}>
+            {authorData.username && (
+              <h1>{authorData.username}</h1>
+            )}
+            <span>
+              {authorData.github_url && (
+                <a href={authorData.github_url}><FaGithub className={Styles.authorIcons}/></a>
+              )}
+              {authorData.linkedin_url && (
+                <a href={authorData.linkedin_url}><FaLinkedin  className={Styles.authorIcons}/></a>
+              )}
+              {authorData.twitter_url && (
+                <a href={authorData.twitter_url}><FaTwitter className={Styles.authorIcons}/></a>
+              )}
+              {authorData.telegram_url && (
+                <a href={authorData.telegram_url}><FaTelegram className={Styles.authorIcons}/></a>
+              )}
+              {authorData.youtube_url && (
+                <a href={authorData.youtube_url}><FaYoutube className={Styles.authorIcons}/></a>
+              )}
+            </span>
+          </div>
+          {authorData.readme && (
+            <p dangerouslySetInnerHTML={{ __html: authorData.readme }}></p>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+export default function AuthorPage() {
+  return (
+    <>
       <Navbar />
       <section style={{ paddingTop: '65px' }}>
-        {loading && <LoadingPlaceholder/>}
-        {error && notFound()}
-        {authorData && (
-          <div className={Styles.container}>
-            {authorData.avatar_url && (
-              <img src={authorData.avatar_url} alt={authorData.username ?? ''} width={100} height={100}/>
-            )}
-            <div className={Styles.head}>
-              {authorData.username && (
-                <h1>{authorData.username}</h1>
-              )}
-              <span>
-                {authorData.github_url && (
-                  <a href={authorData.github_url}><FaGithub className={Styles.authorIcons}/></a>
-                )}
-                {authorData.linkedin_url && (
-                  <a href={authorData.linkedin_url}><FaLinkedin  className={Styles.authorIcons}/></a>
-                )}
-                {authorData.twitter_url && (
-                  <a href={authorData.twitter_url}><FaTwitter className={Styles.authorIcons}/></a>
-                )}
-                {authorData.telegram_url && (
-                  <a href={authorData.telegram_url}><FaTelegram className={Styles.authorIcons}/></a>
-                )}
-                {authorData.youtube_url && (
-                  <a href={authorData.youtube_url}><FaYoutube className={Styles.authorIcons}/></a>
-                )}
-              </span>
-            </div>
-            {authorData.readme && (
-              <p dangerouslySetInnerHTML={{ __html: authorData.readme }}></p>
-            )}
-          </div>
-        )}
+        <Suspense fallback={<LoadingPlaceholder/>}>
+          <AuthorContent />
+        </Suspense>
       </section>
     </>
   );
