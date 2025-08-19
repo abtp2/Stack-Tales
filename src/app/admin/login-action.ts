@@ -35,10 +35,7 @@ export async function login(formData: FormData): Promise<LoginResult & { redirec
       return { error: 'Login failed. No user data received.' }
     }
     revalidatePath('/admin', 'layout')
-    return { 
-      success: true, 
-      redirectPath: '/admin' 
-    }
+    return { success: true }
   } catch (error) {
     console.error('Unexpected login error:', error)
     return { error: 'An unexpected error occurred. Please try again.' }

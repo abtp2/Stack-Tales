@@ -11,11 +11,8 @@ export default function AdminPanelWrapper({ admin }: { admin: User }) {
   useEffect(() => {
     const supabase = createClient()
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!session?.user) {
-        setCurrentAdmin(null)
-      } else {
-        setCurrentAdmin(session?.user)
-      }
+      if (!session?.user) setCurrentAdmin(null)
+      else setCurrentAdmin(session.user)
     })
     return () => {
       listener.subscription.unsubscribe()

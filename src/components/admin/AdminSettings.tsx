@@ -199,9 +199,6 @@ const AdminSettings: React.FC<Props> = ({
       });
       if (res.ok || res.redirected || (res.status === 302)){
         setAdmin(null)
-        if (typeof window !== 'undefined') {
-          window.location.assign('/admin')
-        }
       }
     } catch (err) {
       console.error('Logout error:', err);
