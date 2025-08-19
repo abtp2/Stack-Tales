@@ -30,6 +30,10 @@ export default function AuthorPage() {
   const value = searchParams.get('name');
   const authorName = value ? decodeURIComponent(value) : null;
 
+  if (!authorName) {
+    notFound();
+  }
+
   const supabase = createClient();
 
   useEffect(() => {

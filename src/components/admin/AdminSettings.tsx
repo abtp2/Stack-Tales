@@ -182,13 +182,27 @@ const AdminSettings: React.FC<Props> = ({
   const handleLogout = async () => {
     try {
       setLoggingOut(true);
+      // Ensure client-side session is cleared to prevent refresh attempts with stale tokens
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.error('Client signout error:', e);
+      }
+
       const res = await fetch('/auth/signout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include',
+        redirect: 'manual',
       });
-      if (res.ok || res.redirected || (res.status === 302)){ setAdmin(null) }
+      if (res.ok || res.redirected || (res.status === 302)){
+        setAdmin(null)
+        if (typeof window !== 'undefined') {
+          window.location.assign('/admin')
+        }
+      }
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
