@@ -25,25 +25,6 @@ body.dark{
   --lines: var(--dlines);
 }
 
-/*
-@media(prefers-color-scheme: dark){
-  html{
-  --background: var(--dbg);
-  --color: var(--dcolor);
-  --fade: var(--dfade);
-  --lines: var(--dlines);
-  }
-}
-@media(prefers-color-scheme: light){
-  html{
-  --background: var(--lbg);
-  --color: var(--lcolor);
-  --fade: var(--lfade);
-  --lines: var(--llines);
-  }
-}
-*/
-
 
 html,
 body {
@@ -59,7 +40,6 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
@@ -77,6 +57,7 @@ body {
 }
 ::placeholder{
   color: rgba(var(--color),0.6);
+  user-select: none;
 }
 
 a {

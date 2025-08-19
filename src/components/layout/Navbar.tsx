@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { LuMenu, LuSearch, LuX, LuSun, LuMoon } from "react-icons/lu";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from 'next/link';
 import {useTheme} from "@/app/theme-provider";
 interface Blog {
   title: string;
@@ -132,55 +133,57 @@ const Navbar = () => {
 
   return (
     <div className={Styles.nav}>
-      <Logo />
-      <span>
-        <div className={Styles.sidebar} style={sidebar ? { left: "0" } : { left: "-100%" }}>
-          <LuX onClick={() => setSidebar(false)} />
-          <p onClick={()=>{router.push("")}}>Courses</p>
-          <p onClick={()=>{router.push("")}}>Categories</p>
-          <p onClick={()=>{router.push("")}}>Certificate</p>
-          <p onClick={()=>{router.push("")}}>About</p>
-          <p onClick={()=>{router.push("/admin")}}>Admin</p>
-        </div>
-        <div className={Styles.themeIcon} onClick={()=>{setTheme(theme === 'light' ? 'dark' : 'light')}}>{theme=="light" ? (<LuMoon/>) : (<LuSun/>)}</div>
-        <LuSearch
-          className={Styles.searchIcon}
-          onClick={() => setSearchBox((prev) => !prev)}
-        />
-        {searchBox && (
-          <div className={Styles.searchBox} ref={searchBoxRef}>
-            <div className={Styles.searchBoxInput}>
-              <LuSearch />
-              <input
-                ref={inputRef}
-                placeholder="Search Blogs..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-            </div>
-            <div className={`${Styles.searchBoxResult} custom-scrollbar`}>
-              {loading ? (
-                <span><p style={{ opacity: 0.6, fontStyle: "italic" }}>Loading...</p></span>
-              ) : filteredBlogs.length > 0 ? (
-                filteredBlogs.map((blog, index) => (
-                <span key={`${blog.slug}-${index}`}>
-                  <p onClick={() => handleBlogSelect(blog.slug)} style={{ cursor: "pointer" }}>
-                    {blog.title}
-                  </p></span>
-                ))
-              ) : (
-                <span><p style={{ opacity: 0.6, fontStyle: "italic" }}>
-                  No blogs found
-                </p></span>
-              )}
-            </div>
+      <section>
+        <Logo />
+        <span>
+          <div className={Styles.sidebar} style={sidebar ? { left: "0" } : { left: "-100%" }}>
+            <LuX onClick={() => setSidebar(false)} />
+            <Link href="">Courses</Link>
+            <Link href="">Categories</Link>
+            <Link href="">Certificate</Link>
+            <Link href="">About</Link>
+            <Link href="/admin">Admin</Link>
           </div>
-        )}
-        <LuMenu
-          className={Styles.menuIcon}
-          onClick={() => setSidebar(true)}
-        />
-      </span>
+          <div className={Styles.themeIcon} onClick={()=>{setTheme(theme === 'light' ? 'dark' : 'light')}}>{theme=="light" ? (<LuMoon/>) : (<LuSun/>)}</div>
+          <LuSearch
+            className={Styles.searchIcon}
+            onClick={() => setSearchBox((prev) => !prev)}
+          />
+          {searchBox && (
+            <div className={Styles.searchBox} ref={searchBoxRef}>
+              <div className={Styles.searchBoxInput}>
+                <LuSearch />
+                <input
+                  ref={inputRef}
+                  placeholder="Search Blogs..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
+              <div className={`${Styles.searchBoxResult} custom-scrollbar`}>
+                {loading ? (
+                  <span><p style={{ opacity: 0.6, fontStyle: "italic" }}>Loading...</p></span>
+                ) : filteredBlogs.length > 0 ? (
+                  filteredBlogs.map((blog, index) => (
+                  <span key={`${blog.slug}-${index}`}>
+                    <p onClick={() => handleBlogSelect(blog.slug)} style={{ cursor: "pointer" }}>
+                      {blog.title}
+                    </p></span>
+                  ))
+                ) : (
+                  <span><p style={{ opacity: 0.6, fontStyle: "italic" }}>
+                    No blogs found
+                  </p></span>
+                )}
+              </div>
+            </div>
+          )}
+          <LuMenu
+            className={Styles.menuIcon}
+            onClick={() => setSidebar(true)}
+          />
+        </span>
+      </section>
     </div>
   );
 };
