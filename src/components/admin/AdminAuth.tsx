@@ -17,6 +17,13 @@ export default function AdminAuth() {
     const result = await login(formData)
     if (result?.error) {
       setError(result.error)
+      setLoading(false)
+      return
+    }
+    // On success, redirect to admin page so server loads session cookies
+    if (result?.success) {
+      window.location.assign(result.redirectPath || '/admin')
+      return
     }
     setLoading(false)
   }

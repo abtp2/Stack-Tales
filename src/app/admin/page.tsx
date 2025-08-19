@@ -12,7 +12,7 @@ export default async function AdminPage() {
 
   const { data: admin, error } = await supabase
     .from('admins')
-    .select('id, name, email, role')
+    .select('id, email, role, username')
     .eq('id', user.id)
     .single()
   if (!admin || error) {
