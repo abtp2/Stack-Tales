@@ -255,7 +255,7 @@ const AdminSettings: React.FC<Props> = ({
         </fieldset>
         <fieldset>
           <legend>README</legend>
-          <textarea type="text" name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} placeholder="Use HTML for readme, just like GitHub" required/>
+          <textarea name="readme" value={formData.readme} onChange={handleInputChange} disabled={!isEditing || saving || loggingOut} placeholder="Use HTML for readme, just like GitHub" required/>
         </fieldset>
 
         <span>

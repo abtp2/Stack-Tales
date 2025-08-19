@@ -6,14 +6,20 @@ import { createClient } from '@/lib/supabase/client';
 import LoadingPlaceholder from "@/components/layout/LoadingPlaceholder";
 import Styles from "./author.module.css";
 import { FaGithub, FaLinkedin, FaTwitter, FaTelegram, FaYoutube } from "react-icons/fa";
+import type { Tables } from '@/types/supabase';
 
-interface Author {
-  username: string;
-  avatar_url?: string;
-  github_url?: string;
-  linkedin_url?: string;
-  readme?: string;
-}
+type Author = Pick<
+  Tables<'admins'>,
+  | 'username'
+  | 'avatar_url'
+  | 'github_url'
+  | 'linkedin_url'
+  | 'telegram_url'
+  | 'twitter_url'
+  | 'youtube_url'
+  | 'website_url'
+  | 'readme'
+>;
 
 export default function AuthorPage() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -63,7 +69,7 @@ export default function AuthorPage() {
         {authorData && (
           <div className={Styles.container}>
             {authorData.avatar_url && (
-              <img src={authorData.avatar_url} alt={authorData.username} width={100} height={100}/>
+              <img src={authorData.avatar_url} alt={authorData.username ?? ''} width={100} height={100}/>
             )}
             <div className={Styles.head}>
               {authorData.username && (

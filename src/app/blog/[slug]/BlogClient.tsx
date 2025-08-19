@@ -14,6 +14,11 @@ interface BlogClientProps {
   slug: string;
 }
 
+interface ViewsSessionEntry {
+  id: string;
+  date: number;
+}
+
 
 const parseAndRenderContent = (content: string): ReactNode => {
   if (!content) return null;
@@ -162,8 +167,8 @@ export default function BlogClient({ slug }: BlogClientProps) {
       }
       
       // Views
-        const viewsStorage = JSON.parse(sessionStorage.getItem("StackTales-views") || "[]");
-        if (!viewsStorage.some(item => item.id === blogData.id)) {
+        const viewsStorage: ViewsSessionEntry[] = JSON.parse(sessionStorage.getItem("StackTales-views") || "[]");
+        if (!viewsStorage.some((item: ViewsSessionEntry) => item.id === blogData.id)) {
           const date = Date.now();
           // Fetch current views (optional — if you don't need existing views, skip this)
           const { data: viewsData, error: viewsError } = await supabase
@@ -175,8 +180,12 @@ export default function BlogClient({ slug }: BlogClientProps) {
             console.error("Error fetching views:", viewsError);
             return;
           }
-          // Add current date to views array
-          const updatedViews = Array.isArray(viewsData.views) ? [...viewsData.views, date] : [date];
+          // Add current date to views array (stored as strings per schema)
+          const dateStr = date.toString();
+          const previousViews: string[] = Array.isArray(viewsData?.views)
+            ? (viewsData.views as string[]).map((v) => v.toString())
+            : [];
+          const updatedViews: string[] = [...previousViews, dateStr];
           const { data, error } = await supabase
             .from('blogs')
             .update({ views: updatedViews })
@@ -186,7 +195,7 @@ export default function BlogClient({ slug }: BlogClientProps) {
             return;
           }
           // Update sessionStorage
-          const updatedStorage = [...viewsStorage, { id: blogData.id, date }];
+          const updatedStorage: ViewsSessionEntry[] = [...viewsStorage, { id: blogData.id, date }];
           sessionStorage.setItem("StackTales-views", JSON.stringify(updatedStorage));
         }
       
