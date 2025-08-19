@@ -3,13 +3,11 @@ import { LuLogIn, LuLoaderCircle } from 'react-icons/lu'
 import Logo from '@/components/layout/Logo'
 import Styles from '@/app/admin/admin.module.css'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { login } from '@/app/admin/login-action'
 
 export default function AdminAuth() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -23,8 +21,8 @@ export default function AdminAuth() {
       return
     }
     if (result?.success) {
-      // Soft refresh to re-render server components and pick up new session
-      router.refresh()
+      setLoading(false)
+      window.location.reload();
       return
     }
     setLoading(false)

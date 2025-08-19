@@ -1,7 +1,6 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
 
 type LoginResult = {
   success?: boolean
@@ -34,7 +33,6 @@ export async function login(formData: FormData): Promise<LoginResult & { redirec
     if (!authData.user) {
       return { error: 'Login failed. No user data received.' }
     }
-    revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (error) {
     console.error('Unexpected login error:', error)
