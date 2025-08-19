@@ -347,4 +347,4 @@ export const Constants = {
   public: {
     Enums: {},
   },
-} as Constants
+} as const
