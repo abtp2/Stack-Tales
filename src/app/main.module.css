@@ -116,15 +116,6 @@ text-align: left;
 border: 1.5px solid rgba(var(--color),0.1);
 box-shadow: 0 4px 6px -1px rgba(var(--lcolor),0.05),
             0 2px 4px -1px rgba(var(--lcolor),0.05);
-transition: all 0.3s;
-}
-
-
-.heroCard:hover button svg{
-width: 35px;
-height: 25px;
-border-radius: 50px;
-text-align: right;
 }
 .heroCard span{
 display: flex;
@@ -178,7 +169,12 @@ padding: 5px;
 border-radius: 100%;
 transition: all 0.3s;
 }
-
+.heroCard:hover button svg{
+width: 35px;
+height: 25px;
+border-radius: 50px;
+text-align: right;
+}
 
 /* Second Section */
 .secondSection{
