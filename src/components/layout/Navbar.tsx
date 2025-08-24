@@ -133,7 +133,7 @@ const Navbar = () => {
 
   return (
     <div className={Styles.nav}>
-      <section>
+      <section style={{maxWidth:"1200px !important"}}>
         <Logo />
         <span>
           <div className={Styles.sidebar} style={sidebar ? { left: "0" } : { left: "-100%" }}>
