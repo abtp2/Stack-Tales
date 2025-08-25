@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
-import { LuEye, LuTrendingUp, LuDatabase, LuBox, LuImage, LuMousePointerClick, } from 'react-icons/lu';
+import { LuEye, LuTrendingUp, LuDatabase, LuBox, LuImage, LuMousePointerClick, LuRefreshCcw, } from 'react-icons/lu';
 import { createClient } from '@/lib/supabase/client';
 import Styles from '@/app/admin/admin.module.css';
 import { type User } from '@supabase/supabase-js';
@@ -12,7 +12,7 @@ interface Props {
 const AdminAnalytics: React.FC<Props> = ({admin}) => {
   return(
     <div className={Styles.adminAnalytics}>
-      <h1><LuEye/> <p>Views</p> <span>Views Overview</span></h1>
+      <h1><LuEye/> <p>Views</p> <span>Views Overview</span> <LuRefreshCcw className={Styles.adminAnalyticsRefresh}/></h1>
       <div className={Styles.adminAnalyticsContainer}>
         <div className={Styles.adminAnalyticsBox}>
           <LuEye/>
@@ -33,7 +33,7 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
 
       <br/><br/><br/>
       
-      <h1><LuMousePointerClick/> <p>Clicks</p> <span>Clicks Overview</span></h1>
+      <h1><LuMousePointerClick/> <p>Clicks</p> <span>Clicks Overview</span> <LuRefreshCcw className={Styles.adminAnalyticsRefresh}/></h1>
       <div className={Styles.adminAnalyticsContainer}>
         <div className={Styles.adminAnalyticsBox}>
           <LuEye/>
@@ -54,7 +54,7 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
 
       <br/><br/><br/>
 
-      <h1><LuDatabase/> <p>Storage</p> <span>Storage Overview</span></h1>
+      <h1><LuDatabase/> <p>Storage</p> <span>Storage Overview</span> <LuRefreshCcw className={Styles.adminAnalyticsRefresh}/></h1>
       <div className={Styles.adminAnalyticsContainer}>
         <div className={Styles.adminAnalyticsBox}>
           <LuBox/>
