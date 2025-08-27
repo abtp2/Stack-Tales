@@ -10,24 +10,55 @@ interface Props {
 }
 
 const AdminAnalytics: React.FC<Props> = ({admin}) => {
+  const supabase = createClient();
+  const [viewsData, setViewsData] = useState<[]>([]);
+  const getViewsData = async ()=>{
+    try {
+        const { data, error } = await supabase
+          .from('blogs')
+          .select('views')
+        if (error) throw error;
+        let totalViews=0 ,monthViews=0 ,weekViews=0;
+        data.forEach((row)=>{
+          totalViews += row.views.length;
+          row.views.forEach((rowViews)=>{
+            if((Date.now() - rowViews) >= (1000*60*60*24*7)){
+              weekViews++;
+            }
+            if((Date.now() - rowViews) >= (1000*60*60*24*30)){
+              monthViews++;
+            }
+          })
+        })
+        setViewsData([weekViews,monthViews,totalViews]);
+      } catch (err) {
+        console.error('Failed to fetch views data:', err);
+      }
+  }
+  useEffect(() => {
+    getViewsData();
+  }, []);
+  
+  
+  
   return(
     <div className={Styles.adminAnalytics}>
-      <h1><LuEye/> <p>Views</p> <span>Views Overview</span> <LuRefreshCcw className={Styles.adminAnalyticsRefresh}/></h1>
+      <h1><LuEye/> <p>Views</p> <span>Views Overview</span> <LuRefreshCcw onClick={()=>{getViewsData()}} className={Styles.adminAnalyticsRefresh}/></h1>
       <div className={Styles.adminAnalyticsContainer}>
         <div className={Styles.adminAnalyticsBox}>
           <LuEye/>
           <p>This Week</p>
-          <h2>1234</h2>
+          <h2>{viewsData[0]}</h2>
         </div>
         <div className={Styles.adminAnalyticsBox}>
           <LuEye/>
           <p>This Month</p>
-          <h2>5678</h2>
+          <h2>{viewsData[1]}</h2>
         </div>
         <div className={Styles.adminAnalyticsBox}>
           <LuTrendingUp/>
           <p>Total Views</p>
-          <h2>9739</h2>
+          <h2>{viewsData[2]}</h2>
         </div>
       </div>
 
