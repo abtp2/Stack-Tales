@@ -4,19 +4,30 @@ import { LuEye, LuTrendingUp, LuDatabase, LuBox, LuImage, LuMousePointerClick, L
 import { createClient } from '@/lib/supabase/client';
 import Styles from '@/app/admin/admin.module.css';
 import { type User } from '@supabase/supabase-js';
+import { useRouter } from "next/navigation";
 
 interface Props {
   admin: User;
 }
+interface BlogClick {
+  title: string;
+  clicks: number;
+  slug: string;
+}
+
+
 
 const AdminAnalytics: React.FC<Props> = ({admin}) => {
   const supabase = createClient();
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [viewsData, setViewsData] = useState<[]>([]);
+  const [clicksData, setClicksData] = useState<[number, BlogClick[]]>([0, []]);
+  const router = useRouter();
   const getViewsData = async ()=>{
     try {
-        const { data, error } = await supabase
-          .from('blogs')
-          .select('views')
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('views')
         if (error) throw error;
         let totalViews=0 ,monthViews=0 ,weekViews=0;
         data.forEach((row)=>{
@@ -31,19 +42,43 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
           })
         })
         setViewsData([weekViews,monthViews,totalViews]);
-      } catch (err) {
+    } catch (err) {
         console.error('Failed to fetch views data:', err);
-      }
+    } finally{
+        setTimeout(()=>{setRefreshing(false);}, 1000)
+    }
+  }
+  
+  const getClicksData = async ()=>{
+    try {
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('clicks,title,slug')
+        if (error) throw error;
+        let totalClicks = 0;
+        let blogClicks = [];
+        data.forEach((row)=>{
+          totalClicks += row.clicks;
+          blogClicks.push({title:row.title, clicks:row.clicks, slug:row.slug})
+        })
+        blogClicks.sort((a, b) => b.clicks - a.clicks);
+        setClicksData([totalClicks, blogClicks]);
+    } catch (err) {
+        console.error('Failed to fetch clicks data:', err);
+    } finally {
+        setTimeout(()=>{setRefreshing(false);}, 1000)
+    }
   }
   useEffect(() => {
     getViewsData();
+    getClicksData();
   }, []);
   
   
   
   return(
     <div className={Styles.adminAnalytics}>
-      <h1><LuEye/> <p>Views</p> <span>Views Overview</span> <LuRefreshCcw onClick={()=>{getViewsData()}} className={Styles.adminAnalyticsRefresh}/></h1>
+      <h1><LuEye/> <p>Views</p> <span>Views Overview</span> <LuRefreshCcw onClick={()=>{getViewsData(); setRefreshing(true);}} className={`${Styles.adminAnalyticsRefresh} ${refreshing ? Styles.adminAnalyticsRefreshActive : ""}`}/></h1>
       <div className={Styles.adminAnalyticsContainer}>
         <div className={Styles.adminAnalyticsBox}>
           <LuEye/>
@@ -64,22 +99,17 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
 
       <br/><br/><br/>
       
-      <h1><LuMousePointerClick/> <p>Clicks</p> <span>Clicks Overview</span> <LuRefreshCcw className={Styles.adminAnalyticsRefresh}/></h1>
+      <h1><LuMousePointerClick/> <p>Clicks</p> <span>Clicks Overview</span> <LuRefreshCcw onClick={()=>{getClicksData(); setRefreshing(true);}} className={`${Styles.adminAnalyticsRefresh} ${refreshing ? Styles.adminAnalyticsRefreshActive : ""}`}/></h1>
       <div className={Styles.adminAnalyticsContainer}>
-        <div className={Styles.adminAnalyticsBox}>
-          <LuEye/>
-          <p>This Week</p>
-          <h2>1234</h2>
-        </div>
-        <div className={Styles.adminAnalyticsBox}>
-          <LuEye/>
-          <p>This Month</p>
-          <h2>5678</h2>
-        </div>
-        <div className={Styles.adminAnalyticsBox}>
+        <div className={`${Styles.adminAnalyticsBox} ${Styles.bigAdminAnalyticsBox}`}>
           <LuTrendingUp/>
-          <p>Total Views</p>
-          <h2>9739</h2>
+          <p>Total Clicks - <b>{clicksData[0]}</b></p>
+          <div className={Styles.adminAnalyticsClickData}>
+            {clicksData[1] && (
+            clicksData[1].map((data,index)=>(
+              <span key={index}><i onClick={()=>{router.push(`/blog/${data.slug}`);}}>{data.title}</i><b>{data.clicks}</b></span>
+            )))}
+          </div>
         </div>
       </div>
 
