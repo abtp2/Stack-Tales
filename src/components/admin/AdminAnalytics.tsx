@@ -33,12 +33,10 @@ interface BlogClick {
   slug: string;
 }
 
-
-
 const AdminAnalytics: React.FC<Props> = ({admin}) => {
   const supabase = createClient();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [viewsData, setViewsData] = useState<[]>([]);
+  const [viewsData, setViewsData] = useState<[number, number, number]>([0, 0, 0]);
   const [clicksData, setClicksData] = useState<[number, BlogClick[]]>([0, []]);
   const router = useRouter();
   
@@ -49,16 +47,19 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
         .select('views')
         if (error) throw error;
         let totalViews=0 ,monthViews=0 ,weekViews=0;
-        data.forEach((row)=>{
-          totalViews += row.views.length;
-          row.views.forEach((rowViews)=>{
-            if((Date.now() - rowViews) >= (1000*60*60*24*7)){
-              weekViews++;
-            }
-            if((Date.now() - rowViews) >= (1000*60*60*24*30)){
-              monthViews++;
-            }
-          })
+        data?.forEach((row)=>{
+          if (row.views && Array.isArray(row.views)) {
+            totalViews += row.views.length;
+            row.views.forEach((rowViews)=>{
+              const timestamp = parseInt(rowViews);
+              if(!isNaN(timestamp) && (Date.now() - timestamp) >= (1000*60*60*24*7)){
+                weekViews++;
+              }
+              if(!isNaN(timestamp) && (Date.now() - timestamp) >= (1000*60*60*24*30)){
+                monthViews++;
+              }
+            })
+          }
         })
         setViewsData([weekViews,monthViews,totalViews]);
     } catch (err) {
@@ -75,10 +76,12 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
         .select('clicks,title,slug')
         if (error) throw error;
         let totalClicks = 0;
-        let blogClicks = [];
-        data.forEach((row)=>{
-          totalClicks += row.clicks;
-          blogClicks.push({title:row.title, clicks:row.clicks, slug:row.slug})
+        let blogClicks: BlogClick[] = [];
+        data?.forEach((row)=>{
+          if (row.clicks !== null && row.clicks !== undefined) {
+            totalClicks += row.clicks;
+            blogClicks.push({title:row.title || '', clicks:row.clicks, slug:row.slug || ''})
+          }
         })
         blogClicks.sort((a, b) => b.clicks - a.clicks);
         setClicksData([totalClicks, blogClicks]);
@@ -139,20 +142,18 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
         <div className={Styles.adminAnalyticsBox}>
           <LuBox/>
           <p>Supabase</p><br/>
-          <div className={Styles.adminAnalyticsBar} style={{"--length":"30%"}}>50MB<span>Storage</span></div><br/>
-          <div className={Styles.adminAnalyticsBar} style={{"--length":"60%"}}>279MB<span>Bucket</span></div>
+          <div className={Styles.adminAnalyticsBar} style={{"--length": "30%"} as React.CSSProperties}>50MB<span>Storage</span></div><br/>
+          <div className={Styles.adminAnalyticsBar} style={{"--length": "60%"} as React.CSSProperties}>279MB<span>Bucket</span></div>
         </div>
         <div className={Styles.adminAnalyticsBox}>
           <LuImage/>
           <p>ImageKit</p><br/>
-          <div className={Styles.adminAnalyticsBar} style={{"--length":"80%"}}>2.7GB<span>Storage</span></div><br/>
-          <div className={Styles.adminAnalyticsBar} style={{"--length":"50%"}}>1060/day<span>Requests</span></div>
+          <div className={Styles.adminAnalyticsBar} style={{"--length": "80%"} as React.CSSProperties}>2.7GB<span>Storage</span></div><br/>
+          <div className={Styles.adminAnalyticsBar} style={{"--length": "50%"} as React.CSSProperties}>1060/day<span>Requests</span></div>
         </div>
       </div>
     </div>
   );
 }
-
-
 
 export default AdminAnalytics;
