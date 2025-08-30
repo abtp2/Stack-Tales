@@ -6,6 +6,24 @@ import Styles from '@/app/admin/admin.module.css';
 import { type User } from '@supabase/supabase-js';
 import { useRouter } from "next/navigation";
 
+interface ImageKitConfig {
+  publicKey: string;
+  privateKey: string;
+  urlEndpoint: string;
+}
+interface SupabaseConfig {
+  url: string;
+  serviceRoleKey: string;
+}
+interface ImageKitUsage {
+  storageMB: string;
+  bandwidthMB: string;
+  requests: number;
+}
+interface SupabaseUsage {
+  storageMB: string;
+  bucketCount: number;
+}
 interface Props {
   admin: User;
 }
@@ -23,6 +41,7 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
   const [viewsData, setViewsData] = useState<[]>([]);
   const [clicksData, setClicksData] = useState<[number, BlogClick[]]>([0, []]);
   const router = useRouter();
+  
   const getViewsData = async ()=>{
     try {
       const { data, error } = await supabase
@@ -120,14 +139,14 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
         <div className={Styles.adminAnalyticsBox}>
           <LuBox/>
           <p>Supabase</p><br/>
-          <div className={Styles.adminAnalyticsBar}>28% <span>Table</span></div><br/>
-          <div className={Styles.adminAnalyticsBar}>16.29% <span>Image</span></div>
+          <div className={Styles.adminAnalyticsBar} style={{"--length":"30%"}}>50MB<span>Storage</span></div><br/>
+          <div className={Styles.adminAnalyticsBar} style={{"--length":"60%"}}>279MB<span>Bucket</span></div>
         </div>
         <div className={Styles.adminAnalyticsBox}>
           <LuImage/>
           <p>ImageKit</p><br/>
-          <div className={Styles.adminAnalyticsBar}>28% <span>Videos</span></div><br/>
-          <div className={Styles.adminAnalyticsBar}>16.29% <span>Images</span></div>
+          <div className={Styles.adminAnalyticsBar} style={{"--length":"80%"}}>2.7GB<span>Storage</span></div><br/>
+          <div className={Styles.adminAnalyticsBar} style={{"--length":"50%"}}>1060/day<span>Requests</span></div>
         </div>
       </div>
     </div>

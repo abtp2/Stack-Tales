@@ -947,6 +947,7 @@ color: rgba(var(--color),0.6);
 padding-right: 10px;
 }
 .adminAnalyticsBox .adminAnalyticsBar{
+--length: 100%;
 width: 100%;
 display: flex;
 align-items: center;
@@ -957,7 +958,7 @@ margin: 10px 0 1rem 0;
 font-size: 12px;
 background-image: linear-gradient(
     to right,
-    rgb(var(--theme)) 30%,
+    rgb(var(--theme)) var(--length),
     transparent 0%
   );
 background-repeat: no-repeat;
