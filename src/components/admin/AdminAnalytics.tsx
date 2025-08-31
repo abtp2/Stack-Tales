@@ -1,10 +1,11 @@
 'use client';
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
-import { LuEye, LuTrendingUp, LuDatabase, LuBox, LuImage, LuMousePointerClick, LuRefreshCcw, } from 'react-icons/lu';
+import { LuEye, LuTrendingUp, LuDatabase, LuBox, LuImage, LuMousePointerClick, LuRefreshCcw, LuUsers, LuExternalLink } from 'react-icons/lu';
 import { createClient } from '@/lib/supabase/client';
 import Styles from '@/app/admin/admin.module.css';
 import { type User } from '@supabase/supabase-js';
 import { useRouter } from "next/navigation";
+import Link from 'next/link';
 
 interface ImageKitConfig {
   publicKey: string;
@@ -31,13 +32,25 @@ interface BlogClick {
   title: string;
   clicks: number;
   slug: string;
+  author_id: string;
+  views: any[];
 }
+interface Author {
+  id: string;
+  avatar_url: string;
+  username: string;
+  created_at: string;
+  role: string;
+}
+
+
 
 const AdminAnalytics: React.FC<Props> = ({admin}) => {
   const supabase = createClient();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [viewsData, setViewsData] = useState<[number, number, number]>([0, 0, 0]);
   const [clicksData, setClicksData] = useState<[number, BlogClick[]]>([0, []]);
+  const [authorData, setAuthorData] = useState<Author[]>([]);
   const router = useRouter();
   
   const getViewsData = async ()=>{
@@ -52,10 +65,10 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
             totalViews += row.views.length;
             row.views.forEach((rowViews)=>{
               const timestamp = parseInt(rowViews);
-              if(!isNaN(timestamp) && (Date.now() - timestamp) >= (1000*60*60*24*7)){
+              if(!isNaN(timestamp) && (Date.now() - timestamp) <= (1000*60*60*24*7)){
                 weekViews++;
               }
-              if(!isNaN(timestamp) && (Date.now() - timestamp) >= (1000*60*60*24*30)){
+              if(!isNaN(timestamp) && (Date.now() - timestamp) <= (1000*60*60*24*30)){
                 monthViews++;
               }
             })
@@ -73,14 +86,14 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
     try {
       const { data, error } = await supabase
         .from('blogs')
-        .select('clicks,title,slug')
+        .select('clicks,title,slug,views,author_id')
         if (error) throw error;
         let totalClicks = 0;
         let blogClicks: BlogClick[] = [];
         data?.forEach((row)=>{
           if (row.clicks !== null && row.clicks !== undefined) {
             totalClicks += row.clicks;
-            blogClicks.push({title:row.title || '', clicks:row.clicks, slug:row.slug || ''})
+            blogClicks.push({title:row.title || '', clicks:row.clicks, slug:row.slug || '', author_id:row.author_id || '', views: row.views })
           }
         })
         blogClicks.sort((a, b) => b.clicks - a.clicks);
@@ -91,9 +104,24 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
         setTimeout(()=>{setRefreshing(false);}, 1000)
     }
   }
+  
+  const getAuthorsData = async ()=>{
+    try {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('id,avatar_url,username,created_at,role')
+        if (error) throw error;
+        setAuthorData(data);
+    } catch (err) {
+        console.error('Failed to fetch author data:', err);
+    } finally {
+        setTimeout(()=>{setRefreshing(false);}, 1000)
+    }
+  }
   useEffect(() => {
     getViewsData();
     getClicksData();
+    getAuthorsData();
   }, []);
   
   
@@ -126,7 +154,7 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
         <div className={`${Styles.adminAnalyticsBox} ${Styles.bigAdminAnalyticsBox}`}>
           <LuTrendingUp/>
           <p>Total Clicks - <b>{clicksData[0]}</b></p>
-          <div className={Styles.adminAnalyticsClickData}>
+          <div className={`${Styles.adminAnalyticsClickData} custom-scrollbar`}>
             {clicksData[1] && (
             clicksData[1].map((data,index)=>(
               <span key={index}><i onClick={()=>{router.push(`/blog/${data.slug}`);}}>{data.title}</i><b>{data.clicks}</b></span>
@@ -136,16 +164,42 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
       </div>
 
       <br/><br/><br/>
+      
+      <h1><LuUsers/> <p>Authors Performance</p> <span>Authors performance Overview</span> <LuRefreshCcw onClick={()=>{getAuthorsData(); setRefreshing(true);}} className={`${Styles.adminAnalyticsRefresh} ${refreshing ? Styles.adminAnalyticsRefreshActive : ""}`}/></h1>
+      <div className={Styles.adminAnalyticsContainer}>
+        <div className={`${Styles.adminAnalyticsBox} ${Styles.bigAdminAnalyticsBox}`}>
+          <LuTrendingUp/>
+          <p>Total Authors - <b>{authorData.length}</b></p>
+          <div className={Styles.adminAnalyticsAuthorsData}>
+            {authorData && (
+            authorData.map((data,index)=>(
+              <details key={index}>
+                <summary><img src={data.avatar_url} alt={data.username}/><b>{data.username}</b><i>{data.role}</i></summary>
+                <div>
+                  <span>Profile -&nbsp;<b onClick={()=>{router.push(`/author?name=${data.username}`)}}><LuExternalLink/></b></span>
+                  <span>Total Blogs -&nbsp;<b>{clicksData[1].filter(item => item.author_id == data.id).length}</b></span>
+                  <span>Most Viewed -&nbsp;<b onClick={()=>{router.push(`/blog/${clicksData[1]?.filter(item => item.author_id === data.id).reduce<BlogClick | null>((max, item) => item.views.length > (max?.views?.length || 0) ? item : max, null)?.slug}`)}}><LuExternalLink/></b></span>
+                  <span>Most Clicked -&nbsp;<b onClick={()=>{router.push(`/blog/${clicksData[1]?.filter(item => item.author_id === data.id).reduce((max, item) => item.clicks > (max?.clicks ?? 0) ? item : max, null)?.slug}`)}}><LuExternalLink/></b></span>
+                  <span>Joined On -&nbsp;<b>{new Date(data.created_at).toLocaleDateString("en-GB")}</b></span>
+                </div>
+              </details>
+            )))}
+          </div>
+        </div>
+      </div>
+
+
+      <br/><br/><br/>
 
       <h1><LuDatabase/> <p>Storage</p> <span>Storage Overview</span> <LuRefreshCcw className={Styles.adminAnalyticsRefresh}/></h1>
       <div className={Styles.adminAnalyticsContainer}>
-        <div className={Styles.adminAnalyticsBox}>
+        <div className={`${Styles.adminAnalyticsBox} ${Styles.twoBigAdminAnalyticsBox}`}>
           <LuBox/>
           <p>Supabase</p><br/>
           <div className={Styles.adminAnalyticsBar} style={{"--length": "30%"} as React.CSSProperties}>50MB<span>Storage</span></div><br/>
           <div className={Styles.adminAnalyticsBar} style={{"--length": "60%"} as React.CSSProperties}>279MB<span>Bucket</span></div>
         </div>
-        <div className={Styles.adminAnalyticsBox}>
+        <div className={`${Styles.adminAnalyticsBox} ${Styles.twoBigAdminAnalyticsBox}`}>
           <LuImage/>
           <p>ImageKit</p><br/>
           <div className={Styles.adminAnalyticsBar} style={{"--length": "80%"} as React.CSSProperties}>2.7GB<span>Storage</span></div><br/>
