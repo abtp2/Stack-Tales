@@ -37,10 +37,10 @@ interface BlogClick {
 }
 interface Author {
   id: string;
-  avatar_url: string;
-  username: string;
-  created_at: string;
-  role: string;
+  avatar_url: string | null;
+  username: string | null;
+  created_at: string | null;
+  role: string | null;
 }
 
 
@@ -174,13 +174,31 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
             {authorData && (
             authorData.map((data,index)=>(
               <details key={index}>
-                <summary><img src={data.avatar_url} alt={data.username}/><b>{data.username}</b><i>{data.role}</i></summary>
+                <summary><img src={data.avatar_url || ''} alt={data.username || ''}/><b>{data.username || ''}</b><i>{data.role || ''}</i></summary>
                 <div>
-                  <span>Profile -&nbsp;<b onClick={()=>{router.push(`/author?name=${data.username}`)}}><LuExternalLink/></b></span>
+                  <span>Profile -&nbsp;<b onClick={()=>{router.push(`/author?name=${data.username || ''}`)}}><LuExternalLink/></b></span>
                   <span>Total Blogs -&nbsp;<b>{clicksData[1].filter(item => item.author_id == data.id).length}</b></span>
-                  <span>Most Viewed -&nbsp;<b onClick={()=>{router.push(`/blog/${clicksData[1]?.filter(item => item.author_id === data.id).reduce<BlogClick | null>((max, item) => item.views.length > (max?.views?.length || 0) ? item : max, null)?.slug}`)}}><LuExternalLink/></b></span>
-                  <span>Most Clicked -&nbsp;<b onClick={()=>{router.push(`/blog/${clicksData[1]?.filter(item => item.author_id === data.id).reduce((max, item) => item.clicks > (max?.clicks ?? 0) ? item : max, null)?.slug}`)}}><LuExternalLink/></b></span>
-                  <span>Joined On -&nbsp;<b>{new Date(data.created_at).toLocaleDateString("en-GB")}</b></span>
+                  <span>Most Viewed -&nbsp;<b onClick={()=>{
+                    const authorBlogs = clicksData[1]?.filter(item => item.author_id === data.id) || [];
+                    const mostViewed = authorBlogs.reduce((max, item) => {
+                      const currentViews = item.views?.length || 0;
+                      const maxViews = max?.views?.length || 0;
+                      return currentViews > maxViews ? item : max;
+                    }, null as BlogClick | null);
+                    if (mostViewed?.slug) {
+                      router.push(`/blog/${mostViewed.slug}`);
+                    }
+                  }}><LuExternalLink/></b></span>
+                  <span>Most Clicked -&nbsp;<b onClick={()=>{
+                    const authorBlogs = clicksData[1]?.filter(item => item.author_id === data.id) || [];
+                    const mostClicked = authorBlogs.reduce((max, item) => {
+                      return item.clicks > (max?.clicks ?? 0) ? item : max;
+                    }, null as BlogClick | null);
+                    if (mostClicked?.slug) {
+                      router.push(`/blog/${mostClicked.slug}`);
+                    }
+                  }}><LuExternalLink/></b></span>
+                  <span>Joined On -&nbsp;<b>{new Date(data.created_at || '').toLocaleDateString("en-GB")}</b></span>
                 </div>
               </details>
             )))}
