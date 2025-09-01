@@ -33,7 +33,7 @@ interface BlogClick {
   clicks: number;
   slug: string;
   author_id: string;
-  views: any[];
+  views: any[] || null;
 }
 interface Author {
   id: string;
@@ -93,7 +93,7 @@ const AdminAnalytics: React.FC<Props> = ({admin}) => {
         data?.forEach((row)=>{
           if (row.clicks !== null && row.clicks !== undefined) {
             totalClicks += row.clicks;
-            blogClicks.push({title:row.title || '', clicks:row.clicks, slug:row.slug || '', author_id:row.author_id || '', views: row.views })
+            blogClicks.push({title:row.title || '', clicks:row.clicks, slug:row.slug || '', author_id:row.author_id || '', views: row.views ?? [] })
           }
         })
         blogClicks.sort((a, b) => b.clicks - a.clicks);
