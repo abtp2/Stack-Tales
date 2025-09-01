@@ -33,7 +33,7 @@ interface BlogClick {
   clicks: number;
   slug: string;
   author_id: string;
-  views: any[] || null;
+  views: any[] | null;
 }
 interface Author {
   id: string;
