@@ -245,7 +245,7 @@ align-items: center;
 width: 50px;
 height: 50px;
 border-radius: 100%;
-outline: 1px solid rgba(var(--color));
+outline: 1px solid rgba(var(--color),0.8);
 margin-right: 10px;
 }
 .latestBlogCard span h1{
@@ -261,10 +261,11 @@ color: rgba(var(--color), 0.5);
 margin-top: 2px;
 }
 .latestBlogCard h2{
-font-size: 16px;
+font-size: 15px;
 font-weight: 500;
 margin-top: 1.4rem;
-color: rgba(var(--color), 0.9);
+color: rgba(var(--color), 0.8);
+line-height: 1.5;
 }
 .latestBlogCard h3{
 font-size: 14px;

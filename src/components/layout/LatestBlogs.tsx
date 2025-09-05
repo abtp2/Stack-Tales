@@ -1,51 +1,77 @@
+"use client";
 import Styles from "@/components/layout/layout.module.css";
-import LatestBlogCard from "@/components/layout/LatestBlogCard";
-const latestBlogsList = [
-  {
-    author: "Ashutosh Pandey",
-    photo: "https://avatar.iran.liara.run/public/1",
-    date: "15 June 2025",
-    title: "Mastering React Hooks",
-    description: "Explore how useEffect, useState, and custom hooks can level up your React components."
-  },
-  {
-    author: "Sneha Kapoor",
-    photo: "https://avatar.iran.liara.run/public/2",
-    date: "13 June 2025",
-    title: "TypeScript with React: Best Practices",
-    description: "A beginner-friendly guide to integrating TypeScript into your React projects efficiently."
-  },
-  {
-    author: "Rahul Verma",
-    photo: "https://avatar.iran.liara.run/public/3",
-    date: "10 June 2025",
-    title: "React Performance Optimization Techniques",
-    description: "Learn practical tips like memoization, lazy loading, and avoiding re-renders in React apps."
-  },
-  {
-    author: "Priya Sharma",
-    photo: "https://avatar.iran.liara.run/public/4",
-    date: "08 June 2025",
-    title: "Building a Blog with Next.js 15",
-    description: "Discover how to create a high-performance, SEO-friendly blog using Next.js and Tailwind CSS."
-  },
-  {
-    author: "Aman Mehra",
-    photo: "https://avatar.iran.liara.run/public/5",
-    date: "06 June 2025",
-    title: "Demystifying Redux in 2025",
-    description: "Understand Redux fundamentals and whether you still need it in the modern React ecosystem."
-  }
-];
+import LoadingPlaceholder from "@/components/layout/LoadingPlaceholder";
+import {useState, useEffect} from "react";
+import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 
 
 const LatestBlogs = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [blogsData, setBlogsData] = useState<any[]>([]);
+  const [authorsData, setAuthorsData] = useState<any[]>([]);
+  const supabase = createClient();
+  
+  const loadBlogsData = async () => {
+    setLoading(true);
+    try{
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('*')
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (error || !data) {
+        console.error('Avatar error:', error);
+        setBlogsData([]);
+      }
+      setBlogsData(data);
+    } catch(error){
+      console.error("Error fetching Blogs.")
+    } finally{
+      setLoading(false)
+    }
+  };
+  
+  const loadAuthorData = async () => {
+    setLoading(true);
+    try{
+      const { data, error } = await supabase
+        .from('admins')
+        .select('id,avatar_url,username')
+      if (error || !data) {
+        console.error('Avatar error:', error);
+        setAuthorsData([]);
+      }
+      setAuthorsData(data);
+    } catch(error){
+      console.error("Error fetching Blogs.")
+    } finally{
+      setLoading(false)
+    }
+  };
+    
+  useEffect(() => {
+    loadBlogsData();
+    loadAuthorData();
+  }, []);
+  
+
   return(
     <div className={Styles.latestblogs}>
       <h1 className={Styles.sectionHeading}>Latest Blogs</h1>
-      {latestBlogsList.map((element,index) =>(
-        <LatestBlogCard key={index} author={element.author} date={element.date} title={element.title} description={element.description} authorImage={element.photo}/>
-      ))}
+      {loading ? (<LoadingPlaceholder/>) : (
+      blogsData.map((element,index) =>(
+        <div key={index} className={Styles.latestBlogCard}>
+          <span>
+            <img src={authorsData.find(user => user.id === element.author_id)?.avatar_url} alt={authorsData.find(user => user.id === element.author_id)?.username} />
+            <h1>{authorsData.find(user => user.id === element.author_id)?.username} <p>{new Date(element.created_at).toLocaleDateString("en-GB", { day:"2-digit",month:"long",year:"numeric"})}</p></h1>
+          </span>
+          <h2>{element.title}</h2>
+          <h3>{element.content.replace(/<\/?[^>]+(>|$)/g, "").trim().replace(/\s+/g, " ").slice(0, 100).trim()}....</h3>
+          <button><Link href={`/blog/${element.slug}`}>Read More</Link></button>
+        </div>
+      ))
+      )}
     </div>
   );
 }

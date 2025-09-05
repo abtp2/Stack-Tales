@@ -23,6 +23,7 @@ const LikeBox = () => {
   }
 
   const handleSend = async () => {
+    if (!text.trim()) return;
     const message = `*Feedback from blog:*\n\`${window.location.href}\`\n\n*Was this blog helpful:* ${selectedOption}\n${text ? `*Message:* ${text}` : ""}`;
     setSending(true);
     try {
