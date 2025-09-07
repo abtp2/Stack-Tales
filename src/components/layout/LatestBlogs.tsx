@@ -23,8 +23,9 @@ const LatestBlogs = () => {
       if (error || !data) {
         console.error('Avatar error:', error);
         setBlogsData([]);
+      } else {
+        setBlogsData(data);
       }
-      setBlogsData(data);
     } catch(error){
       console.error("Error fetching Blogs.")
     } finally{
@@ -41,8 +42,9 @@ const LatestBlogs = () => {
       if (error || !data) {
         console.error('Avatar error:', error);
         setAuthorsData([]);
+      } else {
+        setAuthorsData(data);
       }
-      setAuthorsData(data);
     } catch(error){
       console.error("Error fetching Blogs.")
     } finally{
